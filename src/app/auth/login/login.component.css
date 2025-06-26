@@ -256,7 +256,7 @@ img {
     padding: 1.5rem 1.5rem 1rem;
   }
 }
-.register{
+.auth-btn{
   position: absolute;
   top: 1.5rem;
   right: 3rem;
@@ -273,7 +273,7 @@ img {
   transition: all 0.2s ease;
   overflow: hidden;
 }
-.register:hover:not(:disabled) {
+.auth-btn:hover:not(:disabled) {
   background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
   transform: translateY(-1px);
   box-shadow: 0 6px 20px 0 rgba(59, 130, 246, 0.5);
