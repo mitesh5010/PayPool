@@ -6,7 +6,7 @@ import { RouterModule } from '@angular/router';
   selector: 'app-login',
   imports: [ReactiveFormsModule, RouterModule],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  styleUrl: '../../shared/styles/auth.css'
 })
 export class LoginComponent implements OnInit{
 
