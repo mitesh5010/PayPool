@@ -1,0 +1,79 @@
+ <div class="container">
+        <div class="login-card" id="loginCard" [class.shake]="loginForm.invalid && loginForm.touched">
+            <!-- Header -->
+            <div class="header">
+                <div class="logo-container">
+                    <div class="logo">
+                        <img  src="/assets/bg-paypool.png" alt="">
+                    </div>
+                </div>
+                <div class="header-content">
+                    <h1 class="header-title">Welcome Back</h1>
+                    <p class="header-subtitle">Sign in to manage your shared expenses</p>
+                </div>
+            </div>
+
+            <!-- Form -->
+            <div class="form-container">
+                <form id="loginForm" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+                    <!-- Email Field -->
+                    <div class="form-group">
+                        <label class="form-label" for="email">Email Address</label>
+                        <div class="input-wrapper">
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                class="form-input"
+                                placeholder="example@email.com"
+                                formControlName="email"
+                                [class.error]="email?.invalid && email?.touched"
+                            />
+                        </div>
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="form-group">
+                        <label class="form-label" for="password">Password</label>
+                        <div class="input-wrapper">
+                            <div class="password-wrapper">
+                                <input
+                                    [type]="showPassword ? 'text' : 'password'"
+                                    id="password"
+                                    name="password"
+                                    class="form-input"
+                                    placeholder="xxxxxx"
+                                    formControlName="password"
+                                    [class.error]="password?.invalid && password?.touched"
+                                />
+                                <button type="button" class="password-toggle" id="passwordToggle" (click)="togglePasswordVisibility()">
+                                    <svg id="eyeIcon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="submit-btn" id="submitBtn" [disabled]="loginForm.invalid">
+                        <span>Login</span>
+                    </button>
+                </form>
+
+                <!-- Toggle to Register -->
+                <div class="register-section">
+                    <p>
+                        Don't have an account?
+                        <a href="#" class="register-link">Sign up</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>© 2025 PayPool. Simplifying shared expenses.</p>
+        </div>
+    </div>
