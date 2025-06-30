@@ -5,38 +5,7 @@
         <div class="modern-dashboard">
           <app-sidebar />
           <div class="main-content">
-            <div class="dashboard-container" id="dashboard-container">
-              <div class="dashboard-header">
-                <h1 class="page-title">Dashboard</h1>
-                <div class="action-buttons">
-                  <button class="btn btn-primary">Add Expense</button>
-                </div>
-              </div>
-              <div class="summary-cards">
-                <p-card header="Total Expenses" styleClass="custom-card">
-                  <p class="card-amount">$2,847</p>
-                </p-card>
-                <p-card header="You Owe" styleClass="custom-card">
-                  <p class="card-amount">$1,234</p>
-                </p-card>
-                <p-card header="Owed to You" styleClass="custom-card" >
-                  <p class="card-amount">$892</p>
-                </p-card>
-                <p-card header="Active Groups" styleClass="custom-card" >
-                  <p class="card-amount">12</p>
-                </p-card>
-              </div>
-              <div class="chart-section">
-                <div class="chart-area">
-                  Expense Trends <span>Last 30 days</span>
-                  <div class="chart-placeholder">Line Chart Area</div>
-                </div>
-                <div class="chart-area">
-                  Categories
-                  <div class="chart-placeholder">Pie Chart Area</div>
-                </div>
-              </div>
-            </div>
+          <router-outlet />
           </div>
         </div>
       </div>
