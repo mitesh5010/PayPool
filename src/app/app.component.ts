@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { LoginComponent } from "./auth/login/login.component";
-import { RouterOutlet } from '@angular/router';
+import { RouterLink, RouterOutlet } from '@angular/router';
 import { AuthService } from './auth/auth.service';
 import { jwtDecode } from 'jwt-decode';
 
@@ -23,7 +23,6 @@ export interface DecodedToken {
 })
 export class AppComponent implements OnInit{
   title = 'PayPool';
-
   constructor(private auth: AuthService){}
 
   ngOnInit(): void {
@@ -38,5 +37,13 @@ export class AppComponent implements OnInit{
         this.auth.logout(); // optional fallback
       }
     }
-}
+  }
+
+  get isLogin() {
+    return !!this.auth.getToken();
+  }
+  logout() {
+    this.auth.logout();
+  }
+
 }

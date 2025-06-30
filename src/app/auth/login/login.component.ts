@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../auth.service';
 
 @Component({
@@ -14,7 +14,7 @@ export class LoginComponent implements OnInit{
   loginForm!: FormGroup;
   showPassword= false;
   
-  constructor(private fb:FormBuilder, private auth: AuthService){}
+  constructor(private fb:FormBuilder, private auth: AuthService, private router: Router){}
   ngOnInit(): void {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -35,8 +35,7 @@ export class LoginComponent implements OnInit{
     const {email, password} = this.loginForm.value;
   this.auth.login(email, password).subscribe({
     next: () => {
-      console.log('u are log in');
-
+      this.router.navigate(['/dashboard'])
     },
     error: err => alert('Login failed: ' + err.error)
   });
