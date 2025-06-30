@@ -1,1 +1,7 @@
-<app-login />
+<div class="logo">
+  <img src="assets/bg-logo.png" alt="">
+</div>
+@if (isLogin) {
+  <button class="auth-btn" (click)="logout()">Logout</button>
+}
+<router-outlet />
