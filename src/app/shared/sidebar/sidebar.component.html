@@ -1,0 +1,13 @@
+<div class="sidebar">
+            <nav class="nav-menu">
+              @for (link of navLinks; track $index) {
+                <a [routerLink]="[link.path]"
+                routerLinkActive="active"
+                class="nav-item"
+                [routerLinkActiveOptions]="{ exact: !!link.exact }">
+                <div style="width: 20px; height: 20px; background: currentColor; border-radius: 3px; opacity: 0.7;"></div>
+                {{ link.title }}
+              </a>
+            }
+            </nav>
+          </div>
