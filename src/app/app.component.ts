@@ -39,11 +39,4 @@ export class AppComponent implements OnInit{
     }
   }
 
-  get isLogin() {
-    return !!this.auth.getToken();
-  }
-  logout() {
-    this.auth.logout();
-  }
-
 }
