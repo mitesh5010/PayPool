@@ -8,6 +8,7 @@ import { DialogModule } from 'primeng/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { InputText } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { ApiService, User } from '../../Service/api.service';
 
 export interface Group {
   id: number;
@@ -31,15 +32,9 @@ export class GroupsComponent implements OnInit {
   groups: Group[] = [];
   showDialog = false;
   newGroup!: FormGroup;
-  allMembers = [
-  { name: 'John Smith', id: 1 },
-  { name: 'Jane Doe', id: 2 },
-  { name: 'sdferw', id: 3 },
-  { name: 'fgvsdfvg', id: 4 },
-  // ...add your members here
-];
+  allMembers!:User[];
 
-  constructor(private fb: FormBuilder){}
+  constructor(private fb: FormBuilder, private apiService: ApiService){}
 
   ngOnInit() {
     // Replace with real service call
@@ -70,6 +65,9 @@ export class GroupsComponent implements OnInit {
     description: [''],
     members: [[], Validators.required]
     })
+    this.apiService.getAllUsers().subscribe(users => {
+      this.allMembers = users as User[];
+    });
   }
 
   viewGroup(id: number) {
