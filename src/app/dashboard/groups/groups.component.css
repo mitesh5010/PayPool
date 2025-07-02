@@ -1,0 +1,30 @@
+
+.p-button-primary {
+  background: #2563eb;
+  border: none;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px 0 rgba(37, 99, 235, 0.08);
+  gap: 0;
+}
+
+.p-button-primary:hover {
+  background: #1d4ed8;
+}
+.p-border-round-xl {
+  border-radius: 1.25rem !important;
+}
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.group-card {
+  border-radius: 12px;
+  /* padding: 1rem; */
+  background-color: #fff;
+  transition: transform 0.2s ease;
+}
+.group-card:hover {
+  transform: translateY(-4px);
+}
