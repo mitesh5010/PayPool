@@ -1,6 +1,6 @@
  <div class="p-d-flex ai-center p-jc-between p-mb-3 row">
     <h2 class="p-text-2xl font-bold">Groups</h2>
-    <button pButton type="button" label="Add Group" icon="pi pi-plus" class="p-button-primary p-px-4 p-py-2 p-button-rounded" style="font-weight: 400;"></button>
+    <button pButton type="button" label="Create Group" icon="pi pi-plus" class="p-button-primary p-px-4 p-py-2 p-button-rounded" style="font-weight: 400;" (click)="openDialog()"></button>
   </div>
   <div class="flex flex-wrap gap-4">
     @for (group of groups; track group.id) {
@@ -48,3 +48,54 @@
   </div>
 }
 </div>
+
+<!-- Click create group-- Pop up Dialog card -->
+
+<p-dialog
+  header="Create Group"
+  [(visible)]="showDialog"
+  [modal]="true"
+  [closable]="false"
+  [style]="{ width: '400px' }"
+  [contentStyle]="{ 'overflow': 'visible', 'max-height': 'none' }"
+  [blockScroll]="true"
+  [draggable]="false"
+  [styleClass]="'custom-modal'"
+>
+  <form formGroup="newGroup" (ngSubmit)="submitGroup()" class="flex flex-column gap-3" >
+    <div>
+      <label class="block text-sm font-medium mb-1">Group Name</label>
+      <input pInputText  formControlName="name" placeholder="Enter group name" />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1">Description</label>
+      <input pInputText class="w-full" formControlName="description"  placeholder="What's this group for?" />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1">Members</label>
+      <p-multiSelect
+        [options]="allMembers"
+        formControlName="members"
+        optionLabel="name"
+        display="chip"
+        [showToggleAll]="false"
+        [filter]="true"
+        [showHeader]="false"
+        [selectedItemsLabel]="'{0} selected'"
+        [panelStyle]="{ 'min-width': '220px', 'max-height': '210px', 'overflow-y': 'auto' }"
+        class="w-full"
+        [showClear]="true"
+        [virtualScroll]="true"
+        [virtualScrollItemSize]="38"
+        checkbox="true"
+        [appendTo]="'body'"
+      ></p-multiSelect>
+    </div>
+    <div class="flex justify-end gap-2 mt-4">
+      <button pButton type="button" label="Cancel" class="p-button-text" (click)="showDialog = false"></button>
+      <button pButton type="submit" label="Create Group" class="p-button-primary" [disabled]="newGroup.invalid"></button>
+    </div>
+  </form>
+</p-dialog>
