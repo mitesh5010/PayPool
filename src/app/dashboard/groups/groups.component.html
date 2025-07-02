@@ -1,1 +1,50 @@
-<p>groups works!</p>
+ <div class="p-d-flex ai-center p-jc-between p-mb-3 row">
+    <h2 class="p-text-2xl font-bold">Groups</h2>
+    <button pButton type="button" label="Add Group" icon="pi pi-plus" class="p-button-primary p-px-4 p-py-2 p-button-rounded" style="font-weight: 400;"></button>
+  </div>
+  <div class="flex flex-wrap gap-4">
+    @for (group of groups; track group.id) {
+      <div class="p-grid nogutter justify-center w-4">
+      <p-card [style]="{ 'margin-bottom': '1rem' }" styleClass="shadow-2 hover:shadow-4 transition-all">
+        <div class="flex justify-content-between align-items-start mb-3">
+          <div>
+            <div class="text-xl font-semibold text-900">{{ group.name }}</div>
+            <div class="text-sm font-semibold text-500">{{ group.members.length }} members</div>
+          </div>
+          @if (group.status === 'SETTLED') {
+            <span class="text-xs px-2 py-1 border-round font-semibold bg-blue-100 text-blue-700">
+              {{ group.status }}
+            </span>
+          }
+          @if (group.status === 'ACTIVE') {
+            <span class="text-xs px-2 py-1 border-round font-semibold bg-green-100 text-green-700">
+              {{ group.status }}
+            </span>
+          }
+        </div>
+
+        <div class="grid">
+          <div class="col-4 text-center">
+            <div class="text-lg font-bold text-900">${{ group.total }}</div>
+            <div class="text-sm text-gray-800">Total</div>
+          </div>
+          <div class="col-4 text-center">
+            <div class="text-lg font-bold text-red-600">${{ group.youOwe }}</div>
+            <div class="text-sm text-gray-800">You Owe</div>
+          </div>
+          <div class="col-4 text-center">
+            <div class="text-lg font-bold text-green-600">${{ group.owedToYou }}</div>
+            <div class="text-sm text-gray-800">Owed to You</div>
+          </div>
+        </div>
+        
+        <p-divider class="my-3"></p-divider>
+        
+        <div class="flex justify-content-between">
+          <button pButton label="View Details" class="p-button-outlined p-button-sm"></button>
+          <button pButton label="Add Expense" class="p-button-primary p-button-sm"></button>
+        </div>
+      </p-card>
+  </div>
+}
+</div>
