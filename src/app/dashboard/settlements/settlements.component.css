@@ -1,0 +1,74 @@
+/* Maintain all original styles exactly */
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.settlement-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  margin-bottom: 0.5rem;
+  transition: all 0.2s;
+}
+
+.settlement-item:hover {
+  border-color: #d8d8d8;
+  transform: translateY(-2px);
+}
+
+.settlement-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.settlement-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea, #294bf5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+}
+
+.settlement-meta {
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.settlement-amount {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.settlement-amount.positive {
+  color: #10b981; /* Green for positive amounts */
+}
+
+.settlement-amount.negative {
+  color: #ef4444; /* Red for negative amounts */
+}
+
+.settlement-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* PrimeNG button overrides to match design */
+.p-button-outlined {
+  border: 1px solid #cbd5e1 !important;
+  color: #334155 !important;
+  background: transparent !important;
+}
+
+.p-button-outlined:hover {
+  background: #f1f5f9 !important;
+}
