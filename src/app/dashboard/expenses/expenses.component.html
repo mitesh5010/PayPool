@@ -1,7 +1,7 @@
 <!-- Header -->
   <div class="p-d-flex p-ai-center p-jc-between p-mb-3 row">
     <h2 class="p-text-2xl p-font-bold p-text-900">Expenses</h2>
-    <button pButton type="button" label="Add Expense" icon="pi pi-plus" class="p-button-primary p-px-4 p-py-2 p-button-rounded" style="font-weight: 400;"></button>
+    <button pButton type="button" label="Add Expense" icon="pi pi-plus" class="p-button-primary p-px-4 p-py-2 p-button-rounded" style="font-weight: 400;" (click)="openDialog()"></button>
   </div>
   <!-- Expenses List -->
   <div class="p-bg-white p-border-round-xl p-shadow-1">
@@ -31,3 +31,43 @@
       <div class="p-text-center p-p-4 p-text-500">No expenses found.</div>
     }
   </div>
+
+  <p-dialog
+  header="Add New Expense"
+  [(visible)]="showDialog"
+  [modal]="true"
+  [closable]="false"
+  [style]="{ width: '400px' }"
+  [contentStyle]="{ 'overflow': 'visible', 'max-height': 'none' }"
+  [blockScroll]="true"
+  [draggable]="false"
+  [styleClass]="'custom-modal'"
+>
+  <form formGroup="newExpense" (ngSubmit)="submitGroup()" class="flex flex-column gap-3" >
+    
+    <div>
+      <label class="block text-sm font-medium mb-1">Description</label>
+      <input pInputText class="w-full" formControlName="description"  placeholder="What's this expense for?" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Amount</label>
+      <p-inputnumber formControlName="amount" mode="currency" inputId="currency-india" currency="INR" placeholder="Amount" currencyDisplay="code" locale="en-IN" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Group</label>
+      <p-select formControlName="selectedGroup" [options]="groups" optionLabel="name" placeholder="Select Group" class="w-full md:w-56" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">PaidBy</label>
+      <p-select formControlName="selectedGroup" [options]="groupMembers" optionLabel="name" placeholder="Member" class="w-full md:w-56" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Category</label>
+      <p-select formControlName="selectedCategory" [options]="categories" optionLabel="name" placeholder="Select" class="w-full md:w-56" />
+    </div>
+    <div class="flex justify-end gap-2 mt-4">
+      <button pButton type="button" label="Cancel" class="p-button-text" (click)="showDialog = false"></button>
+      <button pButton type="submit" label="Add Expense" class="p-button-primary"></button>
+    </div>
+  </form>
+</p-dialog>
