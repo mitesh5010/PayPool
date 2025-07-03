@@ -5,7 +5,7 @@
   </div>
   <!-- Expenses List -->
   <div class="p-bg-white p-border-round-xl p-shadow-1">
-    @for (expense of expenses.slice().reverse(); track expense.id; let last = $last) {
+    @for (expense of expenses.slice().reverse(); track $index; let last = $last) {
       <div class="p-d-flex p-ai-center p-jc-between p-py-4 p-px-5  row" [ngStyle]="{'border-bottom': !last ? '1px solid #f3f4f6' : 'none'}">
         <div class="p-d-flex p-ai-center" style="gap: 1rem;">
           <div>
@@ -21,7 +21,7 @@
         </div>
         <div class="p-text-right" style="min-width: 90px;">
           <div class="p-font-semibold" [ngClass]="expense.type === 'paid' ? 'p-text-green-600' : 'p-text-red-600'" style="font-size: 1.1rem;">
-            {{ expense.type === 'paid' ? '+' : '-' }}${{ expense.amount }}
+            {{ expense.type === 'paid' ? '+' : '-' }}₹{{ expense.amount }}
           </div>
           <div class="p-text-500 p-text-sm">{{ expense.date }}</div>
         </div>
@@ -43,11 +43,15 @@
   [draggable]="false"
   [styleClass]="'custom-modal'"
 >
-  <form formGroup="newExpense" (ngSubmit)="submitGroup()" class="flex flex-column gap-3" >
+  <form [formGroup]="newExpense" (ngSubmit)="submitExpense()" class="flex flex-column gap-3" >
     
     <div>
       <label class="block text-sm font-medium mb-1">Description</label>
       <input pInputText class="w-full" formControlName="description"  placeholder="What's this expense for?" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Date</label>
+      <p-datepicker formControlName="date" dateFormat="dd-mm-yy" placeholder="Select Date" />
     </div>
     <div>
       <label class="block text-sm font-medium mb-1">Amount</label>
@@ -55,19 +59,19 @@
     </div>
     <div>
       <label class="block text-sm font-medium mb-1">Group</label>
-      <p-select formControlName="selectedGroup" [options]="groups" optionLabel="name" placeholder="Select Group" class="w-full md:w-56" />
+      <p-select formControlName="selectedGroup" [options]="groups" optionLabel="name" optionValue="id" placeholder="Select Group" class="w-full md:w-56" />
     </div>
     <div>
       <label class="block text-sm font-medium mb-1">PaidBy</label>
-      <p-select formControlName="selectedGroup" [options]="groupMembers" optionLabel="name" placeholder="Member" class="w-full md:w-56" />
+      <p-select formControlName="paidBy" [options]="groupMembers" optionLabel="name" optionValue="id"placeholder="Member" class="w-full md:w-56" />
     </div>
     <div>
       <label class="block text-sm font-medium mb-1">Category</label>
-      <p-select formControlName="selectedCategory" [options]="categories" optionLabel="name" placeholder="Select" class="w-full md:w-56" />
+      <p-select formControlName="selectedCategory" [options]="categories" optionLabel="category" optionValue="id" placeholder="Select" class="w-full md:w-56" />
     </div>
     <div class="flex justify-end gap-2 mt-4">
       <button pButton type="button" label="Cancel" class="p-button-text" (click)="showDialog = false"></button>
-      <button pButton type="submit" label="Add Expense" class="p-button-primary"></button>
+      <button pButton type="submit" label="Add Expense" class="p-button-primary" [disabled]="newExpense.invalid"></button>
     </div>
   </form>
 </p-dialog>
