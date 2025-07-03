@@ -10,7 +10,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
-import { ApiService, Category } from '../../Service/api.service';
+import { ApiService, Category, Group, User } from '../../Service/api.service';
 
 export interface Expense {
   description: string;
@@ -34,6 +34,9 @@ export class ExpensesComponent implements OnInit {
   showDialog = false;
   expenses!:any;
   categories!:Category[];
+  groups!: Group[];
+  users!: User[];
+  groupMembers!: User[];
   
   constructor(private apiService: ApiService, private fb: FormBuilder,private datePipe: DatePipe){}
 
@@ -54,6 +57,26 @@ export class ExpensesComponent implements OnInit {
       console.error('Failed to load expenses:', err);
     }
   });
+  this.apiService.getAllGroups().subscribe({
+    next: (data) => {
+      this.groups = data;
+      
+      if (this.groups.length > 0) {
+        this.groupMembers = this.groups[0].members;
+      }
+    }
+    , error: (err) => {
+      console.error('Failed to load groups:', err);
+    }
+  });
+  this.apiService.getAllUsers().subscribe({
+    next: (data) => { 
+      this.users = data;
+    },
+    error: (err) => {
+      console.error('Failed to load users:', err);
+    }
+  });
     this.newExpense = this.fb.group({
       description: ['', Validators.required],
       date: ['', Validators.required],
@@ -62,20 +85,23 @@ export class ExpensesComponent implements OnInit {
       paidBy: ['', Validators.required],
       selectedCategory: ['', Validators.required]
     });
+
+    this.newExpense.get('selectedGroup')?.valueChanges.subscribe((groupId: number) => {
+        const selectedGroup = this.groups.find(g => g.id === groupId);
+        if (selectedGroup) {
+          this.groupMembers = selectedGroup.members;
+          this.newExpense.get('paidBy')?.setValue('');
+        } else {
+          this.groupMembers = [];
+          this.newExpense.get('paidBy')?.setValue('');
+      }
+    });
+    
   }
+  
   openDialog(){
     this.showDialog = true;
   }
-  groupMembers = [
-    {name: 'you', id:1},
-    {name: 'gs', id:2},
-    {name: 'kjn', id:3},
-  ]
-  groups = [
-    {name: 'Weekend trip', id:1},
-    {name: 'bills', id:2},
-    {name: 'sunday', id:3},
-  ]
   submitExpense(){
     if (this.newExpense.valid) {
       const formValue = this.newExpense.value;
