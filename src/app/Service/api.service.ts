@@ -55,4 +55,7 @@ export class ApiService {
   addGroup(group:Group):Observable<Group>{
     return this.http.post<Group>(`${this.apiUrl}/groups`, group);
   }
+  getGroupMembers(groupId: number): Observable<User[]> {
+    return this.http.get<User[]>(`${this.apiUrl}/groups/${groupId}/members`);
+  }
 }
