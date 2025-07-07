@@ -20,7 +20,7 @@
           </div>
         </div>
         <div class="p-text-right" style="min-width: 90px;">
-          <div class="p-font-semibold" [ngClass]="expense.splitType === 'equal' ? 'p-text-green-600' : 'p-text-red-600'" style="font-size: 1.1rem;">
+          <div class="p-font-semibold" [ngClass]="expense.splitType === 'equal' ? 'p-text-green-600' : 'p-text-blue-600'" style="font-size: 1.1rem;">
             ₹{{ expense.amount }}
           </div>
           <div class="p-text-500 p-text-sm">{{ expense.date }}</div>
@@ -35,4 +35,5 @@
     [visible]="showDialog"
     [groups]="groups"
     (close)="showDialog= false"
+    (expenseAdded)="onExpenseAdded($event)"
     />

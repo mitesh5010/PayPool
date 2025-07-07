@@ -32,6 +32,7 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
   selectedGroupId = signal<number | null>(null);
   groupMembers: User[] = [];
   close = output<void>();
+  expenseAdded = output<Expense>();
   splitOptions = [{label: 'Equally', value: 'equal'},
     {label:'Manually', value: 'manual'},
   ]
@@ -43,7 +44,7 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
     if (changes['preSelectedGroupId'] && this.preSelectedGroupId()) {
       const selectedGroup = this.groups().find(g => g.id === this.preSelectedGroupId());
       this.groupMembers = selectedGroup?.members || [];
-      this.newExpense.get('paidBy')?.setValue('');
+      this.newExpense.get('splitType')?.setValue('');
     } 
   }
   ngOnInit(): void {
@@ -82,12 +83,13 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
       amount: formValue.amount,
       date: formattedDate|| '',
       category: this.categories.find(c => c.id === formValue.selectedCategory)?.category || '',
-      splitType: formValue.splitType.value || 'equal',
+      splitType: formValue.splitType,
       selectedMembers: formValue.selectedMembers.map((member: User) => ({ name: member.name, email: member.email })),
     };
     this.api.addExpense(expense).subscribe({
         next: (response) => {
           console.log('Expense added successfully:', response);
+          this.expenseAdded.emit(expense);
           this.close.emit();
           this.newExpense.reset();
         },

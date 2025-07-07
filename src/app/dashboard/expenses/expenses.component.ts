@@ -5,7 +5,7 @@ import { CardModule } from 'primeng/card';
 import {  FormGroup } from '@angular/forms';
 import { ApiService} from '../../Service/api.service';
 import { AddExpenseDialogComponent } from "./add-expense-dialog/add-expense-dialog.component";
-import { Category, Group, User } from '../../Service/data.model';
+import { Category, Expense, Group, User } from '../../Service/data.model';
 
 @Component({
   selector: 'app-expenses',
@@ -17,7 +17,7 @@ import { Category, Group, User } from '../../Service/data.model';
 export class ExpensesComponent implements OnInit {
   newExpense!:FormGroup;
   showDialog = false;
-  expenses!:any;
+  expenses:Expense[]=[];
   categories!:Category[];
   groups!: Group[];
   users!: User[];
@@ -64,22 +64,14 @@ export class ExpensesComponent implements OnInit {
   });
     
   }
+
   
   openDialog(){
     this.showDialog = true;
   }
-  submitExpense(){
-    
-    // this.apiService.addExpense(newExpense).subscribe({
-    //   next: (savedExpense) => {
-    //     this.expenses = [...this.expenses, savedExpense];
-    //     this.showDialog = false;
-    //     this.newExpense.reset();
-    //   },
-    //   error: err => {
-    //     console.error('Failed to add expense:', err);
-    //   }
-    // });
-  }
+
+  onExpenseAdded(newExpense: Expense) {
+  this.expenses = [newExpense,...this.expenses]; // Add new expense to array
+ }
   
 }
