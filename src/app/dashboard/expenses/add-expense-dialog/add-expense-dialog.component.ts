@@ -1,9 +1,8 @@
 import { Component,  effect,  input,  OnInit, output, computed, signal, OnChanges, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
-import { ApiService, Category, Group, User } from '../../../Service/api.service';
+import { ApiService } from '../../../Service/api.service';
 import { DatePipe } from '@angular/common';
-import { Expense } from '../expenses.component';
 import { DatePickerModule } from 'primeng/datepicker';
 import { SelectModule } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
@@ -13,6 +12,7 @@ import { CalendarModule } from 'primeng/calendar';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { DividerModule } from 'primeng/divider';
+import { Category, Expense, Group, User } from '../../../Service/data.model';
 
 @Component({
   selector: 'app-add-expense-dialog',
@@ -32,8 +32,8 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
   selectedGroupId = signal<number | null>(null);
   groupMembers: User[] = [];
   close = output<void>();
-  splitOptions = [{label: 'Euqally', value: 'equal'},
-    {label:'Menually', value: 'manual'},
+  splitOptions = [{label: 'Equally', value: 'equal'},
+    {label:'Manually', value: 'manual'},
   ]
 
   constructor(private fb:FormBuilder, private datePipe:DatePipe, private api: ApiService) {
@@ -54,16 +54,16 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
       description: ['', Validators.required],
       date: ['', Validators.required],
       amount: [null, Validators.required],
-      selectedGroup: [null, Validators.required],
-      spitType: ['equal'],
-      paidBy: ['', Validators.required],
+      selectedGroup: [this.preSelectedGroupId(), Validators.required],
+      splitType: ['equal'],
+      selectedMembers: [[], Validators.required],
       selectedCategory: ['', Validators.required]
     });
 
     this.newExpense.get('selectedGroup')?.valueChanges.subscribe((groupId: number) => {
       const selectedGroup = this.groups().find(g => g.id === groupId);
       this.groupMembers = selectedGroup?.members || [];
-      this.newExpense.get('paidBy')?.setValue('');
+      this.newExpense.get('splitType')?.setValue('');
     });
   }
   selectedGroupName = computed(() => {
@@ -77,13 +77,13 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
       const formattedDate = this.datePipe.transform(formValue.date, 'MMM d y');
 
       const expense: Expense = {
+      selectedGroup: this.groups().find(g => g.id === formValue.selectedGroup|| this.preSelectedGroupId())?.name || '',
       description: formValue.description,
       amount: formValue.amount,
       date: formattedDate|| '',
       category: this.categories.find(c => c.id === formValue.selectedCategory)?.category || '',
-      paidBy: this.groupMembers.find(m => m.id === formValue.paidBy)?.name || '',
-      group: this.groups().find(g => g.id === formValue.selectedGroup)?.name || '',
-      type: formValue.paidBy === 1 ? 'paid' : 'owe',
+      splitType: formValue.splitType.value || 'equal',
+      selectedMembers: formValue.selectedMembers.map((member: User) => ({ name: member.name, email: member.email })),
     };
     this.api.addExpense(expense).subscribe({
         next: (response) => {

@@ -8,8 +8,9 @@ import { DialogModule } from 'primeng/dialog';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputText } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { ApiService, Group, User } from '../../Service/api.service';
+import { ApiService } from '../../Service/api.service';
 import { AddExpenseDialogComponent } from "../expenses/add-expense-dialog/add-expense-dialog.component";
+import { Group, User } from '../../Service/data.model';
 
 
 @Component({

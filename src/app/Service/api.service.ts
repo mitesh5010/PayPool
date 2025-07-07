@@ -1,28 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Expense } from '../dashboard/expenses/expenses.component';
-
-export interface User {
-  readonly id: number;
-  readonly name: string;
-  readonly email: string;
-}
-export interface Category{
-  category:string;
-  id:number;
-}
-export interface Group {
-  id?:number;
-  name:string;
-  description:string;
-  status:'ACTIVE' | 'SETTLED';
-  userId:number;
-  members:User[];
-  total:number;
-  youOwe:number; 
-  owedToYou:number;
-}
+import { Category, Expense, Group, User } from './data.model';
 
 @Injectable({
   providedIn: 'root'

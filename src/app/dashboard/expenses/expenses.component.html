@@ -11,17 +11,17 @@
           <div>
             <div class="p-text-900 p-font-medium" style="font-size: 1.08rem;">{{ expense.description }}</div>
             <div class="p-d-flex p-ai-center p-text-600 p-text-sm" style="gap: 0.5rem;">
-              <span>{{ expense.group }}</span>
+              <span>{{ expense.selectedGroup }}</span>
               <span>•</span>
               <span>{{ expense.category }}</span>
               <span>•</span>
-              <span>Paid by {{ expense.paidBy }}</span>
+              <span>Split by {{ expense.splitType }}</span>
             </div>
           </div>
         </div>
         <div class="p-text-right" style="min-width: 90px;">
-          <div class="p-font-semibold" [ngClass]="expense.type === 'paid' ? 'p-text-green-600' : 'p-text-red-600'" style="font-size: 1.1rem;">
-            {{ expense.type === 'paid' ? '+' : '-' }}₹{{ expense.amount }}
+          <div class="p-font-semibold" [ngClass]="expense.splitType === 'equal' ? 'p-text-green-600' : 'p-text-red-600'" style="font-size: 1.1rem;">
+            ₹{{ expense.amount }}
           </div>
           <div class="p-text-500 p-text-sm">{{ expense.date }}</div>
         </div>

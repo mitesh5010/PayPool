@@ -2,26 +2,10 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
-import { InputTextModule } from 'primeng/inputtext';
-import { CalendarModule } from 'primeng/calendar';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { DialogModule } from 'primeng/dialog';
-import { MultiSelectModule } from 'primeng/multiselect';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { SelectModule } from 'primeng/select';
-import { DatePickerModule } from 'primeng/datepicker';
-import { ApiService, Category, Group, User } from '../../Service/api.service';
+import {  FormGroup } from '@angular/forms';
+import { ApiService} from '../../Service/api.service';
 import { AddExpenseDialogComponent } from "./add-expense-dialog/add-expense-dialog.component";
-
-export interface Expense {
-  description: string;
-  amount: number;
-  date: string;
-  category: string;
-  paidBy: string;
-  group: string;
-  type: 'paid' | 'owe';
-}
+import { Category, Group, User } from '../../Service/data.model';
 
 @Component({
   selector: 'app-expenses',
