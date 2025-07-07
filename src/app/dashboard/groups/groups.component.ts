@@ -8,12 +8,14 @@ import { DialogModule } from 'primeng/dialog';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputText } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { ApiService, Group, User } from '../../Service/api.service';
+import { ApiService } from '../../Service/api.service';
+import { AddExpenseDialogComponent } from "../expenses/add-expense-dialog/add-expense-dialog.component";
+import { Group, User } from '../../Service/data.model';
 
 
 @Component({
   selector: 'app-groups',
-  imports: [ButtonModule, MenuModule, CommonModule, CardModule, DividerModule, DialogModule, InputText, MultiSelectModule, ReactiveFormsModule],
+  imports: [ButtonModule, MenuModule, CommonModule, CardModule, DividerModule, DialogModule, InputText, MultiSelectModule, ReactiveFormsModule, AddExpenseDialogComponent],
   templateUrl: './groups.component.html',
   styleUrl: './groups.component.css',
   encapsulation: ViewEncapsulation.None
@@ -21,10 +23,12 @@ import { ApiService, Group, User } from '../../Service/api.service';
 })
 export class GroupsComponent implements OnInit {
   groups!: Group[];
-  showDialog = false;
+  showGroupDialog = false;
+  showExDialog = false;
   newGroup!: FormGroup;
   allMembers!:User[];
   id!:number;
+  selectedGroupId:number = 0;
 
   constructor(private fb: FormBuilder, private apiService: ApiService){}
 
@@ -32,10 +36,18 @@ export class GroupsComponent implements OnInit {
     // Replace with real service call
     this.apiService.getAllGroups().subscribe({
       next: (data) => {
-        this.groups = data;
+        this.groups = data.slice().reverse();
       },
       error: (err) => {
         console.error('Failed to load groups:', err);
+      }
+    });
+    this.apiService.getAllUsers().subscribe({
+      next: (data) => {
+        this.allMembers = data;
+      },
+      error: (err) => {
+        console.error('Failed to load users:', err);
       }
     });
     this.newGroup = this.fb.group({
@@ -52,13 +64,15 @@ export class GroupsComponent implements OnInit {
   viewGroup(id: number) {
     // Navigate to group details
   }
+  openExpenseDialog(groupId: number) {
+  this.selectedGroupId = groupId;
+  this.showExDialog = true;
+}
 
   addExpense(id: number) {
     // Open add expense dialog/modal
   }
-  openDialog(){
-    this.showDialog = true;
-  }
+  
   submitGroup(){
     if (this.newGroup.valid) {
       const formValue = this.newGroup.value;
@@ -76,7 +90,7 @@ export class GroupsComponent implements OnInit {
       this.apiService.addGroup(newGroup).subscribe({
         next: (data) => {
           this.groups = [...this.groups, data];
-          this.showDialog = false;
+          this.showGroupDialog = false;
           this.newGroup.reset();
         },
         error: (err) => {

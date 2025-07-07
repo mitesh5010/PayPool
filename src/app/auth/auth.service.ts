@@ -2,12 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs';
+import { User } from '../Service/data.model';
 
-interface User  {
-  name: string
-  email: string,
-  password: string,
-}
 @Injectable({
   providedIn: 'root'
 })

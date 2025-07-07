@@ -1,19 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { LoginComponent } from "./auth/login/login.component";
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 import { AuthService } from './auth/auth.service';
 import { jwtDecode } from 'jwt-decode';
-
-export interface DecodedToken {
-  user: {
-    id: number;
-    email: string;
-    password: string;
-    name: string;
-  };
-  iat: number;
-  exp: number;
-}
+import { DecodedToken } from './Service/data.model';
 
 @Component({
   selector: 'app-root',
