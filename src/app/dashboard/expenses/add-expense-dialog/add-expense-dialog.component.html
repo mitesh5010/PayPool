@@ -122,6 +122,15 @@
         }
       </div> -->
 
+      @if (newExpense.get('splitType')?.value === 'manual') {
+      <span
+        class="text-sm"
+        [class.text-green-500]="validateSplit()"
+        [class.text-red-500]="!validateSplit()"
+      >
+        {{ validateSplit() ? "Amounts match" : "Amounts do not match total" }}
+      </span>
+      }
       <div class="selected-members mt-3" formArrayName="members">
         @for ( memberGroup of membersFormArray.controls; track $index; let i=
         $index) {
@@ -133,18 +142,29 @@
             <p-checkbox formControlName="selected" [binary]="true" />
             <span>{{ memberGroup.get("name")?.value }}</span>
           </div>
-          <p-inputNumber
-            formControlName="amount"
-            mode="currency"
-            inputId="currency-india"
-            currency="INR"
-            placeholder="Amount"
-            currencyDisplay="code"
-            locale="en-IN"
-            styleClass=""
-            size="small"
-            variant="filled"
-          />
+          <div class="flex align-items-center gap-2">
+            @if (newExpense.get('splitType')?.value === 'equal') {
+            <span class="font-medium">
+              {{
+                memberGroup.get("selected")?.value
+                  ? (memberGroup.get("amount")?.value
+                    | currency : "INR" : "symbol" : "1.2-2")
+                  : "0"
+              }}
+            </span>
+            }@else {
+            <p-inputNumber
+              formControlName="amount"
+              mode="currency"
+              currency="INR"
+              placeholder="Amount"
+              styleClass="w-8rem"
+              size="small"
+              variant="filled"
+              [disabled]="!memberGroup.get('selected')?.value"
+            />
+            }
+          </div>
         </div>
         }
       </div>

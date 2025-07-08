@@ -6,6 +6,7 @@ import {
   OnChanges,
   SimpleChanges,
   computed,
+  signal,
 } from '@angular/core';
 import {
   FormArray,
@@ -16,7 +17,7 @@ import {
 } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
 import { ApiService } from '../../../Service/api.service';
-import { DatePipe } from '@angular/common';
+import { CurrencyPipe, DatePipe } from '@angular/common';
 import { DatePickerModule } from 'primeng/datepicker';
 import { SelectModule } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
@@ -45,6 +46,7 @@ import { CheckboxModule } from 'primeng/checkbox';
     SelectButtonModule,
     DividerModule,
     CheckboxModule,
+    CurrencyPipe
   ],
   templateUrl: './add-expense-dialog.component.html',
   styleUrls: ['./add-expense-dialog.component.css'],
@@ -65,6 +67,8 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
     { label: 'Equally', value: 'equal' },
     { label: 'Manually', value: 'manual' },
   ];
+  totalAmount = signal<number | null>(null);
+  
 
   constructor(
     private fb: FormBuilder,
@@ -75,6 +79,7 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
   ngOnInit(): void {
     this.initializeForm();
     this.loadCategories();
+    
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -102,33 +107,96 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
       ?.valueChanges.subscribe((groupId: number) => {
         this.updateGroupMembers(groupId);
       });
+      
+    // Watch for amount changes
+    this.newExpense.get('amount')?.valueChanges.subscribe(amount => {
+      this.totalAmount.set(amount);
+      this.updateSplitAmounts();
+    });
+
+    // Watch for split type changes
+    this.newExpense.get('splitType')?.valueChanges.subscribe(() => {
+      this.updateSplitAmounts();
+    });
+
+  }
+  private updateSplitAmounts(): void {
+  if (this.newExpense.get('splitType')?.value === 'equal') {
+    this.calculateEqualSplit();
+  }else {
+      this.enableManualInputs();
+    }
+  }
+  private enableManualInputs(): void {
+    this.membersFormArray.controls.forEach(control => {
+      const selected = control.get('selected')?.value;
+      if (selected) {
+        control.get('amount')?.enable();
+      } else {
+        control.get('amount')?.setValue(0);
+        control.get('amount')?.disable();
+      }
+    });
   }
   private initializeMembersArray(): void {
-    const membersArray = this.newExpense.get('members') as FormArray;
-    membersArray.clear(); // Clear existing controls
+  const membersArray = this.membersFormArray;
+  membersArray.clear();
 
-    this.groupMembers.forEach((member) => {
-      const memberGroup = this.fb.group({
-        selected: [false],
-        id: [member.id],
-        name: [member.name],
-        email: [member.email],
-        amount: [{ value: null, disabled: true }],
-      });
-
-      // Set up value changes for the selected control
-      memberGroup.get('selected')?.valueChanges.subscribe((selected) => {
-        const amountControl = memberGroup.get('amount');
-        if (selected) {
-          amountControl?.enable();
-        } else {
-          amountControl?.disable();
-          amountControl?.reset(null);
-        }
-      });
-
-      membersArray.push(memberGroup);
+  this.groupMembers.forEach(member => {
+    const memberGroup = this.fb.group({
+      selected: [false],
+      id: [member.id],
+      name: [member.name],
+      email: [member.email],
+      amount: [{ value: 0, disabled: true }],
     });
+
+    memberGroup.get('selected')?.valueChanges.subscribe(() => {
+      this.updateSplitAmounts();
+    });
+
+    membersArray.push(memberGroup);
+  });
+
+  this.updateSplitAmounts();
+}
+  private calculateEqualSplit(): void {
+  const totalAmount = this.newExpense.get('amount')?.value;
+  const selectedMembers = this.membersFormArray.controls
+    .filter(control => control.get('selected')?.value);
+  
+  if (!totalAmount || selectedMembers.length === 0) {
+    this.membersFormArray.controls.forEach(control => {
+      control.get('amount')?.setValue(0);
+      control.get('amount')?.disable();
+    });
+    return;
+  }
+
+   const baseAmount = Math.floor((totalAmount / selectedMembers.length) * 100) / 100;
+    const remainder = Math.round((totalAmount - (baseAmount * selectedMembers.length)) * 100);
+    
+    this.membersFormArray.controls.forEach((control, index) => {
+      if (control.get('selected')?.value) {
+        const amount = index < remainder ? baseAmount + 0.01 : baseAmount;
+        control.get('amount')?.setValue(amount);
+        control.get('amount')?.disable();
+      } else {
+        control.get('amount')?.setValue(0);
+        control.get('amount')?.disable();
+      }
+    });
+}
+
+  validateSplit(): boolean {
+    if (this.newExpense.get('splitType')?.value === 'equal') return true;
+
+    const membersArray = this.membersFormArray;
+    const totalSplit = membersArray.controls
+      .filter(control => control.get('selected')?.value)
+      .reduce((sum, control) => sum + (control.get('amount')?.value || 0), 0);
+
+    return Math.abs(totalSplit - this.totalAmount()!) < 0.01; // Allow for floating point precision
   }
 
   private loadCategories(): void {
@@ -141,8 +209,6 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
     const selectedGroup = this.groups().find((g) => g.id === groupId);
     this.groupMembers = selectedGroup?.members || [];
     console.log('Group members:', this.groupMembers);
-
-    this.newExpense.get('selectedMembers')?.setValue([]);
     this.initializeMembersArray();
   }
   get membersFormArray(): FormArray {
@@ -153,6 +219,7 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
     return this.groups().find((g: Group) => g.id === this.preSelectedGroupId())
       ?.name;
   });
+  
 
   onSubmit(): void {
     console.log('Submit triggered');
@@ -211,6 +278,7 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
     if (this.preSelectedGroupId()) {
       this.updateGroupMembers(this.preSelectedGroupId()!);
     }
+    this.totalAmount.set(null);
 
     this.close.emit();
   }
