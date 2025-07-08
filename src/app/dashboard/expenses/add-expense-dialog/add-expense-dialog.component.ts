@@ -44,7 +44,7 @@ import { CheckboxModule } from 'primeng/checkbox';
     MultiSelectModule,
     SelectButtonModule,
     DividerModule,
-    CheckboxModule
+    CheckboxModule,
   ],
   templateUrl: './add-expense-dialog.component.html',
   styleUrls: ['./add-expense-dialog.component.css'],
@@ -60,7 +60,7 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
   newExpense!: FormGroup;
   categories: Category[] = [];
   groupMembers: User[] = [];
-  
+
   readonly splitOptions = [
     { label: 'Equally', value: 'equal' },
     { label: 'Manually', value: 'manual' },
@@ -80,7 +80,9 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['preSelectedGroupId'] && this.preSelectedGroupId()) {
       this.updateGroupMembers(this.preSelectedGroupId()!);
-      this.newExpense.get('selectedGroup')?.setValue(this.preSelectedGroupId(), { emitEvent: false });
+      this.newExpense
+        .get('selectedGroup')
+        ?.setValue(this.preSelectedGroupId(), { emitEvent: false });
     }
   }
 
@@ -92,41 +94,42 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
       selectedGroup: [this.preSelectedGroupId() ?? null, Validators.required],
       splitType: ['equal'],
       selectedCategory: ['', Validators.required],
-      members: this.fb.array([]) 
+      members: this.fb.array([]),
     });
 
-    this.newExpense.get('selectedGroup')?.valueChanges.subscribe((groupId: number) => {
-      this.updateGroupMembers(groupId);
-    });
+    this.newExpense
+      .get('selectedGroup')
+      ?.valueChanges.subscribe((groupId: number) => {
+        this.updateGroupMembers(groupId);
+      });
   }
   private initializeMembersArray(): void {
     const membersArray = this.newExpense.get('members') as FormArray;
     membersArray.clear(); // Clear existing controls
 
-    this.groupMembers.forEach(member => {
-    const memberGroup = this.fb.group({
-      selected: [false],
-      id: [member.id],
-      name: [member.name],
-      email: [member.email],
-      amount: [{value: null, disabled: true}]
-    });
+    this.groupMembers.forEach((member) => {
+      const memberGroup = this.fb.group({
+        selected: [false],
+        id: [member.id],
+        name: [member.name],
+        email: [member.email],
+        amount: [{ value: null, disabled: true }],
+      });
 
-    // Set up value changes for the selected control
-    memberGroup.get('selected')?.valueChanges.subscribe(selected => {
-      const amountControl = memberGroup.get('amount');
-      if (selected) {
-        amountControl?.enable();
-      } else {
-        amountControl?.disable();
-        amountControl?.reset(null);
-      }
-    });
+      // Set up value changes for the selected control
+      memberGroup.get('selected')?.valueChanges.subscribe((selected) => {
+        const amountControl = memberGroup.get('amount');
+        if (selected) {
+          amountControl?.enable();
+        } else {
+          amountControl?.disable();
+          amountControl?.reset(null);
+        }
+      });
 
-    membersArray.push(memberGroup);
-  });
+      membersArray.push(memberGroup);
+    });
   }
-  
 
   private loadCategories(): void {
     this.api.getCategories().subscribe((categories: Category[]) => {
@@ -135,8 +138,10 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
   }
 
   private updateGroupMembers(groupId: number): void {
-    const selectedGroup = this.groups().find(g => g.id === groupId);
+    const selectedGroup = this.groups().find((g) => g.id === groupId);
     this.groupMembers = selectedGroup?.members || [];
+    console.log('Group members:', this.groupMembers);
+
     this.newExpense.get('selectedMembers')?.setValue([]);
     this.initializeMembersArray();
   }
@@ -144,42 +149,44 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
     return this.newExpense.get('members') as FormArray;
   }
 
-   selectedGroupName = computed(() => {
+  selectedGroupName = computed(() => {
     return this.groups().find((g: Group) => g.id === this.preSelectedGroupId())
       ?.name;
   });
-  
+
   onSubmit(): void {
     console.log('Submit triggered');
     if (this.newExpense.invalid) {
       console.warn('Form invalid:', this.newExpense.value);
       return;
     }
-    
+
     const formValue = this.newExpense.value;
-    const formattedDate = this.datePipe.transform(formValue.date, 'MMM d y') || '';
+    const formattedDate =
+      this.datePipe.transform(formValue.date, 'MMM d y') || '';
     const groupId = formValue.selectedGroup || this.preSelectedGroupId();
     const selectedMembers = this.membersFormArray.controls
-      .filter(control => control.get('selected')?.value)
-      .map(control => ({
+      .filter((control) => control.get('selected')?.value)
+      .map((control) => ({
         id: control.get('id')?.value,
         email: control.get('email')?.value,
-        amount: control.get('amount')?.value
+        amount: control.get('amount')?.value,
       }));
-      if (selectedMembers.length === 0) {
-        alert('No members selected');
-        return;
-      }
+    if (selectedMembers.length === 0) {
+      alert('No members selected');
+      return;
+    }
 
     const expense: Expense = {
-      selectedGroup: this.groups().find(g => g.id === groupId)?.name || '',
+      selectedGroup: this.groups().find((g) => g.id === groupId)?.name || '',
       description: formValue.description,
       amount: formValue.amount,
       date: formattedDate,
-      category: this.categories.find(c => c.id === formValue.selectedCategory)?.category || '',
+      category:
+        this.categories.find((c) => c.id === formValue.selectedCategory)
+          ?.category || '',
       splitType: formValue.splitType,
-      splitDetails: selectedMembers
- 
+      splitDetails: selectedMembers,
     };
 
     this.api.addExpense(expense).subscribe({
@@ -187,7 +194,7 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
         this.expenseAdded.emit(expense);
         this.resetForm();
       },
-      error: (error) => console.error('Error adding expense:', error)
+      error: (error) => console.error('Error adding expense:', error),
     });
   }
 
@@ -198,13 +205,13 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
   private resetForm(): void {
     this.newExpense.reset({
       splitType: 'equal',
-      selectedGroup: this.preSelectedGroupId() ?? null
+      selectedGroup: this.preSelectedGroupId() ?? null,
     });
-    
+
     if (this.preSelectedGroupId()) {
       this.updateGroupMembers(this.preSelectedGroupId()!);
     }
-    
+
     this.close.emit();
   }
 }

@@ -2,35 +2,49 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
-import {  MenuModule } from 'primeng/menu';
+import { MenuModule } from 'primeng/menu';
 import { DividerModule } from 'primeng/divider';
 import { DialogModule } from 'primeng/dialog';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { InputText } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { ApiService } from '../../Service/api.service';
-import { AddExpenseDialogComponent } from "../expenses/add-expense-dialog/add-expense-dialog.component";
+import { AddExpenseDialogComponent } from '../expenses/add-expense-dialog/add-expense-dialog.component';
 import { Group, User } from '../../Service/data.model';
-
 
 @Component({
   selector: 'app-groups',
-  imports: [ButtonModule, MenuModule, CommonModule, CardModule, DividerModule, DialogModule, InputText, MultiSelectModule, ReactiveFormsModule, AddExpenseDialogComponent],
+  imports: [
+    ButtonModule,
+    MenuModule,
+    CommonModule,
+    CardModule,
+    DividerModule,
+    DialogModule,
+    InputText,
+    MultiSelectModule,
+    ReactiveFormsModule,
+    AddExpenseDialogComponent,
+  ],
   templateUrl: './groups.component.html',
   styleUrl: './groups.component.css',
-  encapsulation: ViewEncapsulation.None
-
+  encapsulation: ViewEncapsulation.None,
 })
 export class GroupsComponent implements OnInit {
   groups!: Group[];
   showGroupDialog = false;
   showExDialog = false;
   newGroup!: FormGroup;
-  allMembers!:User[];
-  id!:number;
-  selectedGroupId:number = 0;
+  allMembers!: User[];
+  id!: number;
+  selectedGroupId: number = 0;
 
-  constructor(private fb: FormBuilder, private apiService: ApiService){}
+  constructor(private fb: FormBuilder, private apiService: ApiService) {}
 
   ngOnInit() {
     // Replace with real service call
@@ -40,7 +54,7 @@ export class GroupsComponent implements OnInit {
       },
       error: (err) => {
         console.error('Failed to load groups:', err);
-      }
+      },
     });
     this.apiService.getAllUsers().subscribe({
       next: (data) => {
@@ -48,13 +62,13 @@ export class GroupsComponent implements OnInit {
       },
       error: (err) => {
         console.error('Failed to load users:', err);
-      }
+      },
     });
     this.newGroup = this.fb.group({
       name: ['', Validators.required],
       description: [''],
-      members: [[], Validators.required]
-    });  
+      members: [[], Validators.required],
+    });
   }
   getUserId(): number {
     const user = localStorage.getItem('user');
@@ -65,27 +79,31 @@ export class GroupsComponent implements OnInit {
     // Navigate to group details
   }
   openExpenseDialog(groupId: number) {
-  this.selectedGroupId = groupId;
-  this.showExDialog = true;
-}
+    this.selectedGroupId = groupId;
+    this.showExDialog = true;
+  }
 
   addExpense(id: number) {
     // Open add expense dialog/modal
   }
-  
-  submitGroup(){
+
+  submitGroup() {
     if (this.newGroup.valid) {
       const formValue = this.newGroup.value;
 
-      const newGroup: Group ={
+      const newGroup: Group = {
         name: formValue.name,
         description: formValue.description || '',
         status: 'ACTIVE',
         userId: this.getUserId(),
-        members: formValue.members.map((member: User) => ({ name: member.name, email: member.email })),
+        members: formValue.members.map((member: User) => ({
+          id: member.id,
+          name: member.name,
+          email: member.email,
+        })),
         total: 0,
         youOwe: 0,
-        owedToYou: 0
+        owedToYou: 0,
       };
       this.apiService.addGroup(newGroup).subscribe({
         next: (data) => {
@@ -95,9 +113,8 @@ export class GroupsComponent implements OnInit {
         },
         error: (err) => {
           console.error('Failed to add group:', err);
-        }
+        },
       });
-      
     }
   }
 }
