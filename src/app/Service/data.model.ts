@@ -14,6 +14,11 @@ export interface User {
   readonly name: string;
   readonly email: string;
 }
+export interface SplitDetail {
+  id: number;
+  email: string;
+  amount: number;
+}
 
 export interface Expense {
   description: string;
@@ -22,7 +27,7 @@ export interface Expense {
   date: string;
   category: string;
   splitType: 'equal' | 'manual';
-  selectedMembers: string[];
+  splitDetails: SplitDetail[];
 }
 
 export interface Category{

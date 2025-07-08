@@ -91,13 +91,40 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
       amount: [null, [Validators.required, Validators.min(0.01)]],
       selectedGroup: [this.preSelectedGroupId() ?? null, Validators.required],
       splitType: ['equal'],
-      selectedMembers: [[], Validators.required],
       selectedCategory: ['', Validators.required],
+      members: this.fb.array([]) 
     });
 
     this.newExpense.get('selectedGroup')?.valueChanges.subscribe((groupId: number) => {
       this.updateGroupMembers(groupId);
     });
+  }
+  private initializeMembersArray(): void {
+    const membersArray = this.newExpense.get('members') as FormArray;
+    membersArray.clear(); // Clear existing controls
+
+    this.groupMembers.forEach(member => {
+    const memberGroup = this.fb.group({
+      selected: [false],
+      id: [member.id],
+      name: [member.name],
+      email: [member.email],
+      amount: [{value: null, disabled: true}]
+    });
+
+    // Set up value changes for the selected control
+    memberGroup.get('selected')?.valueChanges.subscribe(selected => {
+      const amountControl = memberGroup.get('amount');
+      if (selected) {
+        amountControl?.enable();
+      } else {
+        amountControl?.disable();
+        amountControl?.reset(null);
+      }
+    });
+
+    membersArray.push(memberGroup);
+  });
   }
   
 
@@ -111,6 +138,10 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
     const selectedGroup = this.groups().find(g => g.id === groupId);
     this.groupMembers = selectedGroup?.members || [];
     this.newExpense.get('selectedMembers')?.setValue([]);
+    this.initializeMembersArray();
+  }
+  get membersFormArray(): FormArray {
+    return this.newExpense.get('members') as FormArray;
   }
 
    selectedGroupName = computed(() => {
@@ -119,11 +150,26 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
   });
   
   onSubmit(): void {
-    if (this.newExpense.invalid) return;
-
+    console.log('Submit triggered');
+    if (this.newExpense.invalid) {
+      console.warn('Form invalid:', this.newExpense.value);
+      return;
+    }
+    
     const formValue = this.newExpense.value;
     const formattedDate = this.datePipe.transform(formValue.date, 'MMM d y') || '';
     const groupId = formValue.selectedGroup || this.preSelectedGroupId();
+    const selectedMembers = this.membersFormArray.controls
+      .filter(control => control.get('selected')?.value)
+      .map(control => ({
+        id: control.get('id')?.value,
+        email: control.get('email')?.value,
+        amount: control.get('amount')?.value
+      }));
+      if (selectedMembers.length === 0) {
+        alert('No members selected');
+        return;
+      }
 
     const expense: Expense = {
       selectedGroup: this.groups().find(g => g.id === groupId)?.name || '',
@@ -132,11 +178,7 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
       date: formattedDate,
       category: this.categories.find(c => c.id === formValue.selectedCategory)?.category || '',
       splitType: formValue.splitType,
-      selectedMembers: formValue.selectedMembers.map((member: User) => ({
-        id: member.id,
-        name: member.name,
-        email: member.email,
-      })),
+      splitDetails: selectedMembers
  
     };
 
