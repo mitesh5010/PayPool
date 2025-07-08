@@ -1,13 +1,11 @@
 import {
   Component,
-  effect,
   input,
-  OnInit,
   output,
-  computed,
-  signal,
+  OnInit,
   OnChanges,
   SimpleChanges,
+  computed,
 } from '@angular/core';
 import {
   FormBuilder,
@@ -44,23 +42,23 @@ import { Category, Expense, Group, User } from '../../../Service/data.model';
     MultiSelectModule,
     SelectButtonModule,
     DividerModule,
-    MultiSelectModule,
   ],
   templateUrl: './add-expense-dialog.component.html',
-  styleUrl: './add-expense-dialog.component.css',
+  styleUrls: ['./add-expense-dialog.component.css'],
   providers: [DatePipe],
 })
 export class AddExpenseDialogComponent implements OnInit, OnChanges {
+  readonly visible = input<boolean>(false);
+  readonly groups = input<Group[]>([]);
+  readonly preSelectedGroupId = input<number | null>(null);
+  readonly close = output<void>();
+  readonly expenseAdded = output<Expense>();
+
   newExpense!: FormGroup;
-  visible = input<boolean>(false);
-  groups = input<Group[]>([]);
-  categories!: Category[];
-  preSelectedGroupId = input<number | null>();
-  selectedGroupId = signal<number | null>(null);
+  categories: Category[] = [];
   groupMembers: User[] = [];
-  close = output<void>();
-  expenseAdded = output<Expense>();
-  splitOptions = [
+  
+  readonly splitOptions = [
     { label: 'Equally', value: 'equal' },
     { label: 'Manually', value: 'manual' },
   ];
@@ -70,91 +68,94 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
     private datePipe: DatePipe,
     private api: ApiService
   ) {}
+
   ngOnInit(): void {
-    this.api.getCategories().subscribe((categories: Category[]) => {
-      this.categories = categories;
-    });
+    this.initializeForm();
+    this.loadCategories();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['preSelectedGroupId'] && this.preSelectedGroupId()) {
+      this.updateGroupMembers(this.preSelectedGroupId()!);
+      this.newExpense.get('selectedGroup')?.setValue(this.preSelectedGroupId(), { emitEvent: false });
+    }
+  }
+
+  private initializeForm(): void {
     this.newExpense = this.fb.group({
       description: ['', Validators.required],
       date: ['', Validators.required],
-      amount: [null, Validators.required],
+      amount: [null, [Validators.required, Validators.min(0.01)]],
       selectedGroup: [this.preSelectedGroupId() ?? null, Validators.required],
       splitType: ['equal'],
       selectedMembers: [[], Validators.required],
       selectedCategory: ['', Validators.required],
     });
 
-    this.newExpense
-      .get('selectedGroup')
-      ?.valueChanges.subscribe((groupId: number) => {
-        const selectedGroup = this.groups().find((g) => g.id === groupId);
-        this.groupMembers = selectedGroup?.members || [];
-        this.newExpense.get('splitType')?.setValue('');
-      });
-      if (this.preSelectedGroupId() != null) { // Check for null or undefined
-      this.updateGroupMembers(this.preSelectedGroupId() as number | null);
-    }
+    this.newExpense.get('selectedGroup')?.valueChanges.subscribe((groupId: number) => {
+      this.updateGroupMembers(groupId);
+    });
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['preSelectedGroupId'] && this.preSelectedGroupId()!= null) {
-      this.updateGroupMembers(this.preSelectedGroupId() as number | null);
-      this.newExpense.get('selectedGroup')?.setValue(this.preSelectedGroupId(), { emitEvent: false });
-    }
+  private loadCategories(): void {
+    this.api.getCategories().subscribe((categories: Category[]) => {
+      this.categories = categories;
+    });
   }
-  private updateGroupMembers(groupId: number | null): void {
-    const selectedGroup = this.groups().find((g) => g.id === groupId);
+
+  private updateGroupMembers(groupId: number): void {
+    const selectedGroup = this.groups().find(g => g.id === groupId);
     this.groupMembers = selectedGroup?.members || [];
-    this.newExpense.get('selectedMembers')?.setValue([]); // Reset selected members when group changes
-    
+    this.newExpense.get('selectedMembers')?.setValue([]);
   }
-  selectedGroupName = computed(() => {
+
+   selectedGroupName = computed(() => {
     return this.groups().find((g: Group) => g.id === this.preSelectedGroupId())
       ?.name;
   });
+  onSubmit(): void {
+    if (this.newExpense.invalid) return;
 
-  onSubmit() {
-    if (this.newExpense.valid) {
-      const formValue = this.newExpense.value;
+    const formValue = this.newExpense.value;
+    const formattedDate = this.datePipe.transform(formValue.date, 'MMM d y') || '';
+    const groupId = formValue.selectedGroup || this.preSelectedGroupId();
 
-      const formattedDate = this.datePipe.transform(formValue.date, 'MMM d y');
+    const expense: Expense = {
+      selectedGroup: this.groups().find(g => g.id === groupId)?.name || '',
+      description: formValue.description,
+      amount: formValue.amount,
+      date: formattedDate,
+      category: this.categories.find(c => c.id === formValue.selectedCategory)?.category || '',
+      splitType: formValue.splitType,
+      selectedMembers: formValue.selectedMembers.map((member: User) => ({
+        name: member.name,
+        email: member.email,
+      })),
+    };
 
-      const expense: Expense = {
-        selectedGroup:
-          this.groups().find(
-            (g) =>
-              g.id === (formValue.selectedGroup || this.preSelectedGroupId())
-          )?.name || '',
-        description: formValue.description,
-        amount: formValue.amount,
-        date: formattedDate || '',
-        category:
-          this.categories.find((c) => c.id === formValue.selectedCategory)
-            ?.category || '',
-        splitType: formValue.splitType,
-        selectedMembers: formValue.selectedMembers.map((member: User) => ({
-          name: member.name,
-          email: member.email,
-        })),
-      };
-      this.api.addExpense(expense).subscribe({
-        next: (response) => {
-          console.log('Expense added successfully:', response);
-          this.expenseAdded.emit(expense);
-          this.close.emit();
-          this.newExpense.reset();
-        },
-        error: (error) => {
-          console.error('Error adding expense:', error);
-        },
-      });
-    }
+    this.api.addExpense(expense).subscribe({
+      next: () => {
+        this.expenseAdded.emit(expense);
+        this.resetForm();
+      },
+      error: (error) => console.error('Error adding expense:', error)
+    });
   }
-  onClose() {
-    this.close.emit();
-    this.newExpense.reset();
+
+  onClose(): void {
+    this.resetForm();
+  }
+
+  private resetForm(): void {
+    this.newExpense.reset({
+      splitType: 'equal',
+      selectedGroup: this.preSelectedGroupId() ?? null
+    });
+    
     if (this.preSelectedGroupId()) {
-      this.updateGroupMembers(this.preSelectedGroupId() as number | null);
+      this.updateGroupMembers(this.preSelectedGroupId()!);
     }
+    
+    this.close.emit();
   }
 }
