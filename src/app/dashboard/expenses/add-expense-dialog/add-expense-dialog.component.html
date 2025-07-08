@@ -4,7 +4,7 @@
   [modal]="true"
   [closable]="false"
   [style]="{ width: '600px' }"
-  [contentStyle]="{ overflow: 'visible', 'max-height': 'none' }"
+  [contentStyle]="{ 'overflow-y': 'auto', 'max-height': 'none' }"
   [draggable]="false"
   [styleClass]="'custom-modal'"
 >
@@ -85,7 +85,8 @@
 
     <div>
       <label class="block text-sm font-medium mb-1">Members</label>
-      <p-multiSelect
+      <!-- for multiselect dropdown -->
+      <!-- <p-multiSelect
         [options]="groupMembers"
         formControlName="selectedMembers"
         optionLabel="name"
@@ -106,7 +107,44 @@
         checkbox="true"
         [appendTo]="'body'"
         placeholder="Select Members"
-      ></p-multiSelect>
+      ></p-multiSelect> -->
+      <!-- <div class="selected-members mt-3">
+        @for (member of newExpense.get('selectedMembers')?.value; track $index)
+        {
+        <div
+          class="flex align-items-center justify-content-between p-2 border-bottom-1 surface-border"
+        >
+          <span>{{ member.name }}</span>
+          <span class="font-bold">11.00</span>
+        </div>
+        }
+      </div> -->
+
+
+      <div class="selected-members mt-3" formArrayName="members">
+        @for ( member of groupMembers; track $index; let i= $index)
+        {
+        <div [formGroupName]="i" class="flex align-items-center justify-content-between gap-2 p-1" >
+          <div class="flex align-items-center gap-3">
+            <p-checkbox formControlName="selected" [binary]="true" />
+            <span>{{ member.name }}</span>
+          </div>
+          <p-inputNumber
+            formControlName="amount"
+            mode="currency"
+            inputId="currency-india"
+            currency="INR"
+            placeholder="Amount"
+            currencyDisplay="code"
+            locale="en-IN"
+            styleClass=""
+            size="small"
+            variant="filled"
+            
+          />
+        </div>
+        }
+      </div>
     </div>
     <div class="flex justify-end gap-2 mt-4">
       <button

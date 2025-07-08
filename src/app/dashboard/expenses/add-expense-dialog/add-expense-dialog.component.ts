@@ -8,6 +8,7 @@ import {
   computed,
 } from '@angular/core';
 import {
+  FormArray,
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
@@ -26,6 +27,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { DividerModule } from 'primeng/divider';
 import { Category, Expense, Group, User } from '../../../Service/data.model';
+import { CheckboxModule } from 'primeng/checkbox';
 
 @Component({
   selector: 'app-add-expense-dialog',
@@ -42,6 +44,7 @@ import { Category, Expense, Group, User } from '../../../Service/data.model';
     MultiSelectModule,
     SelectButtonModule,
     DividerModule,
+    CheckboxModule
   ],
   templateUrl: './add-expense-dialog.component.html',
   styleUrls: ['./add-expense-dialog.component.css'],
@@ -96,6 +99,7 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
       this.updateGroupMembers(groupId);
     });
   }
+  
 
   private loadCategories(): void {
     this.api.getCategories().subscribe((categories: Category[]) => {
@@ -113,6 +117,7 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
     return this.groups().find((g: Group) => g.id === this.preSelectedGroupId())
       ?.name;
   });
+  
   onSubmit(): void {
     if (this.newExpense.invalid) return;
 
@@ -128,9 +133,11 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
       category: this.categories.find(c => c.id === formValue.selectedCategory)?.category || '',
       splitType: formValue.splitType,
       selectedMembers: formValue.selectedMembers.map((member: User) => ({
+        id: member.id,
         name: member.name,
         email: member.email,
       })),
+ 
     };
 
     this.api.addExpense(expense).subscribe({
