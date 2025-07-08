@@ -8,87 +8,87 @@
   [draggable]="false"
   [styleClass]="'custom-modal'"
 >
-@if (newExpense) {
+  @if (newExpense) {
 
   <form
-  [formGroup]="newExpense"
-  (ngSubmit)="onSubmit()"
-  class="flex flex-column gap-2 p-2"
+    [formGroup]="newExpense"
+    (ngSubmit)="onSubmit()"
+    class="flex flex-column gap-2 p-2"
   >
-  @if (preSelectedGroupId()) {
+    @if (preSelectedGroupId()) {
     <label class="block text-xl font-medium mb-1 m-auto">
       {{ selectedGroupName() }}
     </label>
-  } @else {
+    } @else {
     <div>
       <label class="block text-sm font-medium mb-1">Group</label>
       <p-select
-      formControlName="selectedGroup"
-      [options]="groups()"
-      optionLabel="name"
-      optionValue="id"
-      placeholder="Select Group"
-      class="w-full md:w-56"
+        formControlName="selectedGroup"
+        [options]="groups()"
+        optionLabel="name"
+        optionValue="id"
+        placeholder="Select Group"
+        class="w-full md:w-56"
       />
     </div>
-  }
-  <div>
-    <label class="block text-sm font-medium mb-1">Description</label>
-    <input
-    pInputText
-    class="w-full"
-    formControlName="description"
-    placeholder="What's this expense for?"
-    />
-  </div>
-  <div class="flex flex-row gap-3">
+    }
     <div>
+      <label class="block text-sm font-medium mb-1">Description</label>
+      <input
+        pInputText
+        class="w-full"
+        formControlName="description"
+        placeholder="What's this expense for?"
+      />
+    </div>
+    <div class="flex flex-row gap-3">
+      <div>
         <label class="block text-sm font-medium mb-1">Amount</label>
         <p-inputnumber
-        formControlName="amount"
-        mode="currency"
+          formControlName="amount"
+          mode="currency"
           inputId="currency-india"
           currency="INR"
           placeholder="Amount"
           currencyDisplay="code"
           locale="en-IN"
-          />
-        </div>
-        <div>
-          <label class="block text-sm font-medium mb-1">Date</label>
-          <p-datepicker
+        />
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Date</label>
+        <p-datepicker
           formControlName="date"
           dateFormat="dd-mm-yy"
           placeholder="Select Date"
-          />
-        </div>
+        />
       </div>
-      <div>
-        <label class="block text-sm font-medium mb-1">Category</label>
-        <p-select
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Category</label>
+      <p-select
         formControlName="selectedCategory"
         [options]="categories"
         optionLabel="category"
         optionValue="id"
         placeholder="Select"
         class="w-full md:w-56"
-        />
-      </div>
-      <div class="">
-        <label class="block text-sm font-medium mb-1">Split Type</label>
-        <p-selectButton
+      />
+    </div>
+    <div class="">
+      <label class="block text-sm font-medium mb-1">Split Type</label>
+      <p-selectButton
         [options]="splitOptions"
         formControlName="splitType"
         optionLabel="label"
         optionValue="value"
-        />
-      </div>
-      <p-divider class="m-0" />
-      
-      <div>
-        <label class="block text-sm font-medium mb-1">Members</label>
-        <!-- for multiselect dropdown -->
-        <!-- <p-multiSelect
+      />
+    </div>
+    <p-divider class="m-0" />
+
+    <div>
+      <label class="block text-sm font-medium mb-1">Members</label>
+      <!-- for multiselect dropdown -->
+      <!-- <p-multiSelect
         [options]="groupMembers"
         formControlName="selectedMembers"
         optionLabel="name"
@@ -110,7 +110,7 @@
           [appendTo]="'body'"
           placeholder="Select Members"
           ></p-multiSelect> -->
-          <!-- <div class="selected-members mt-3">
+      <!-- <div class="selected-members mt-3">
             @for (member of newExpense.get('selectedMembers')?.value; track $index)
             {
               <div
@@ -121,17 +121,19 @@
         </div>
         }
       </div> -->
-      
-      
+
       <div class="selected-members mt-3" formArrayName="members">
-        @for ( memberGroup of membersFormArray.controls; track $index; let i= $index)
-        {
-          <div [formGroupName]="i" class="flex align-items-center justify-content-between gap-2 p-1" >
-            <div class="flex align-items-center gap-3">
-              <p-checkbox formControlName="selected" [binary]="true" />
-              <span>{{ memberGroup.get('name')?.value }}</span>
-            </div>
-            <p-inputNumber
+        @for ( memberGroup of membersFormArray.controls; track $index; let i=
+        $index) {
+        <div
+          [formGroupName]="i"
+          class="flex align-items-center justify-content-between gap-2 p-1"
+        >
+          <div class="flex align-items-center gap-3">
+            <p-checkbox formControlName="selected" [binary]="true" />
+            <span>{{ memberGroup.get("name")?.value }}</span>
+          </div>
+          <p-inputNumber
             formControlName="amount"
             mode="currency"
             inputId="currency-india"
@@ -142,33 +144,31 @@
             styleClass=""
             size="small"
             variant="filled"
-            
           />
         </div>
-      }
+        }
+      </div>
     </div>
-  </div>
-  <div class="flex justify-end gap-2 mt-4">
-    <button
+    <div class="flex justify-end gap-2 mt-4">
+      <button
         pButton
         type="button"
         label="Cancel"
         class="p-button-text"
         (click)="onClose()"
-        ></button>
-        <button
+      ></button>
+      <button
         pButton
         type="submit"
         label="Add Expense"
         class="p-button-primary"
-        ></button>
-        @if (newExpense.invalid && newExpense.touched) {
-          <div class="text-red-500 text-sm mt-2">
-  Please fill in all required fields.
-</div>
-        }
+      ></button>
+      @if (newExpense.invalid && newExpense.touched) {
+      <div class="text-red-500 text-sm mt-2">
+        Please fill in all required fields.
       </div>
-    </form>
+      }
+    </div>
+  </form>
   }
-  </p-dialog>
-  
+</p-dialog>
