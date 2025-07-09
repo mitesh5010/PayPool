@@ -12,12 +12,11 @@ import {
   FormArray,
   FormBuilder,
   FormGroup,
-  ReactiveFormsModule,
   Validators,
+  ReactiveFormsModule,
 } from '@angular/forms';
-import { DialogModule } from 'primeng/dialog';
-import { ApiService } from '../../../Service/api.service';
 import { CurrencyPipe, DatePipe } from '@angular/common';
+import { DialogModule } from 'primeng/dialog';
 import { DatePickerModule } from 'primeng/datepicker';
 import { SelectModule } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
@@ -27,8 +26,11 @@ import { CalendarModule } from 'primeng/calendar';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { DividerModule } from 'primeng/divider';
-import { Category, Expense, Group, User } from '../../../Service/data.model';
 import { CheckboxModule } from 'primeng/checkbox';
+
+import { ApiService } from '../../../Service/api.service';
+import { Category, Expense, Group, User } from '../../../Service/data.model';
+import { distinctUntilChanged } from 'rxjs';
 
 @Component({
   selector: 'app-add-expense-dialog',
@@ -46,19 +48,21 @@ import { CheckboxModule } from 'primeng/checkbox';
     SelectButtonModule,
     DividerModule,
     CheckboxModule,
-    CurrencyPipe
+    CurrencyPipe,
   ],
   templateUrl: './add-expense-dialog.component.html',
   styleUrls: ['./add-expense-dialog.component.css'],
   providers: [DatePipe],
 })
 export class AddExpenseDialogComponent implements OnInit, OnChanges {
+  // Inputs & Outputs
   readonly visible = input<boolean>(false);
   readonly groups = input<Group[]>([]);
   readonly preSelectedGroupId = input<number | null>(null);
   readonly close = output<void>();
   readonly expenseAdded = output<Expense>();
 
+  // Form & Data
   newExpense!: FormGroup;
   categories: Category[] = [];
   groupMembers: User[] = [];
@@ -67,8 +71,8 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
     { label: 'Equally', value: 'equal' },
     { label: 'Manually', value: 'manual' },
   ];
+
   totalAmount = signal<number | null>(null);
-  
 
   constructor(
     private fb: FormBuilder,
@@ -79,18 +83,24 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
   ngOnInit(): void {
     this.initializeForm();
     this.loadCategories();
-    
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['preSelectedGroupId'] && this.preSelectedGroupId()) {
-      this.updateGroupMembers(this.preSelectedGroupId()!);
-      this.newExpense
-        .get('selectedGroup')
-        ?.setValue(this.preSelectedGroupId(), { emitEvent: false });
+    if (changes['visible'] && changes['visible'].currentValue === true) {
+    // Reset form when dialog becomes visible
+    this.initializeForm();
+  }
+    
+    if (changes['preSelectedGroupId'] && this.newExpense) {
+      const newGroupId = this.preSelectedGroupId();
+      if (newGroupId) {
+        this.newExpense.get('selectedGroup')?.setValue(newGroupId, { emitEvent: false });
+        this.updateGroupMembers(newGroupId);
+      }
     }
   }
 
+  // Form Initialization 
   private initializeForm(): void {
     this.newExpense = this.fb.group({
       description: ['', Validators.required],
@@ -101,32 +111,124 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
       selectedCategory: ['', Validators.required],
       members: this.fb.array([]),
     });
+    if (this.preSelectedGroupId()) {
+    this.updateGroupMembers(this.preSelectedGroupId()!);
+  }
 
-    this.newExpense
-      .get('selectedGroup')
-      ?.valueChanges.subscribe((groupId: number) => {
-        this.updateGroupMembers(groupId);
-      });
-      
-    // Watch for amount changes
-    this.newExpense.get('amount')?.valueChanges.subscribe(amount => {
+    this.subscribeToFormChanges();
+  }
+
+  private subscribeToFormChanges(): void {
+    this.newExpense.get('selectedGroup')?.valueChanges.subscribe((groupId: number) => {
+      this.updateGroupMembers(groupId);
+    });
+
+    this.newExpense.get('amount')?.valueChanges.subscribe((amount: number) => {
       this.totalAmount.set(amount);
       this.updateSplitAmounts();
     });
 
-    // Watch for split type changes
     this.newExpense.get('splitType')?.valueChanges.subscribe(() => {
       this.updateSplitAmounts();
     });
-
   }
-  private updateSplitAmounts(): void {
-  if (this.newExpense.get('splitType')?.value === 'equal') {
-    this.calculateEqualSplit();
-  }else {
+
+  // --- Computed ---
+  selectedGroupName = computed(() => {
+    return this.groups().find(g => g.id === this.preSelectedGroupId())?.name ?? 'Not Found';
+  });
+
+  // --- Loaders ---
+  private loadCategories(): void {
+    this.api.getCategories().subscribe((categories: Category[]) => {
+      this.categories = categories;
+    });
+  }
+
+  private updateGroupMembers(groupId: number): void {
+    const selectedGroup = (this.groups()??[]).find(g => g.id === groupId);
+    this.groupMembers = selectedGroup?.members ?? [];
+    this.initializeMembersArray();
+  }
+
+  private initializeMembersArray(): void {
+     this.membersFormArray.clear();
+
+    this.groupMembers.forEach(member => {
+      console.log(member);
+      
+      const memberGroup = this.fb.group({
+        selected: [true],
+        id: [member.id],
+        name: [member.name],
+        email: [member.email],
+        amount: [{ value: 0, disabled: true }],
+      });
+
+      memberGroup.get('selected')?.valueChanges
+    .pipe(distinctUntilChanged()) 
+    .subscribe(() => this.updateSplitAmounts());
+
+      this.membersFormArray.push(memberGroup);
+    });
+    
+    this.updateSplitAmounts();
+  }
+
+  get membersFormArray(): FormArray {
+    return (this.newExpense?.get('members') as FormArray) ?? this.fb.array([]);
+  }
+
+  // --- Split Logic ---
+   updateSplitAmounts(): void {
+
+    if (this.newExpense.get('splitType')?.value === 'equal') {
+      this.calculateEqualSplit();
+    } else {
       this.enableManualInputs();
     }
+    const totalAmount = this.newExpense.get('amount')?.value;
+     if (!totalAmount) {
+    this.membersFormArray.controls.forEach(control => {
+      control.get('amount')?.setValue(0);
+      control.get('amount')?.disable();
+    });
+    return;
   }
+  }
+
+  private calculateEqualSplit(): void {
+    const totalAmount = this.totalAmount();
+    const selectedMembers = this.membersFormArray.controls.filter(c => c.get('selected')?.value);
+
+    if (!totalAmount || selectedMembers.length === 0) {
+    this.membersFormArray.controls.forEach(control => {
+      const amountControl = control.get('amount');
+      amountControl?.setValue(0);
+      amountControl?.disable();
+    });
+    return;
+  }
+
+  const memberCount = selectedMembers.length;
+  const totalCents = Math.round(totalAmount * 100);
+  const baseCents = Math.floor(totalCents / memberCount);
+  const remainder = totalCents % memberCount;
+  let selectedIndex = 0;
+
+  this.membersFormArray.controls.forEach(control => {
+    const amountControl = control.get('amount');
+    if (control.get('selected')?.value) {
+      const extraCent = selectedIndex < remainder ? 1 : 0;
+      amountControl?.setValue(Number(((baseCents + extraCent) / 100).toFixed(2)));
+      selectedIndex++;
+    } else {
+      amountControl?.setValue(0);
+    }
+    amountControl?.disable();
+  });
+  }
+
   private enableManualInputs(): void {
     this.membersFormArray.controls.forEach(control => {
       const selected = control.get('selected')?.value;
@@ -138,120 +240,53 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
       }
     });
   }
-  private initializeMembersArray(): void {
-  const membersArray = this.membersFormArray;
-  membersArray.clear();
-
-  this.groupMembers.forEach(member => {
-    const memberGroup = this.fb.group({
-      selected: [false],
-      id: [member.id],
-      name: [member.name],
-      email: [member.email],
-      amount: [{ value: 0, disabled: true }],
-    });
-
-    memberGroup.get('selected')?.valueChanges.subscribe(() => {
-      this.updateSplitAmounts();
-    });
-
-    membersArray.push(memberGroup);
-  });
-
-  this.updateSplitAmounts();
-}
-  private calculateEqualSplit(): void {
-  const totalAmount = this.newExpense.get('amount')?.value;
-  const selectedMembers = this.membersFormArray.controls
-    .filter(control => control.get('selected')?.value);
-  
-  if (!totalAmount || selectedMembers.length === 0) {
-    this.membersFormArray.controls.forEach(control => {
-      control.get('amount')?.setValue(0);
-      control.get('amount')?.disable();
-    });
-    return;
-  }
-
-   const baseAmount = Math.floor((totalAmount / selectedMembers.length) * 100) / 100;
-    const remainder = Math.round((totalAmount - (baseAmount * selectedMembers.length)) * 100);
-    
-    this.membersFormArray.controls.forEach((control, index) => {
-      if (control.get('selected')?.value) {
-        const amount = index < remainder ? baseAmount + 0.01 : baseAmount;
-        control.get('amount')?.setValue(amount);
-        control.get('amount')?.disable();
-      } else {
-        control.get('amount')?.setValue(0);
-        control.get('amount')?.disable();
-      }
-    });
-}
 
   validateSplit(): boolean {
     if (this.newExpense.get('splitType')?.value === 'equal') return true;
 
-    const membersArray = this.membersFormArray;
-    const totalSplit = membersArray.controls
+    const totalSplit = this.membersFormArray.controls
       .filter(control => control.get('selected')?.value)
-      .reduce((sum, control) => sum + (control.get('amount')?.value || 0), 0);
+      .reduce((sum, control) => sum + (+control.get('amount')?.value || 0), 0);
 
-    return Math.abs(totalSplit - this.totalAmount()!) < 0.01; // Allow for floating point precision
+    return Math.abs(totalSplit - this.totalAmount()!) < 0.01; // Floating point tolerance
   }
 
-  private loadCategories(): void {
-    this.api.getCategories().subscribe((categories: Category[]) => {
-      this.categories = categories;
-    });
-  }
-
-  private updateGroupMembers(groupId: number): void {
-    const selectedGroup = this.groups().find((g) => g.id === groupId);
-    this.groupMembers = selectedGroup?.members || [];
-    console.log('Group members:', this.groupMembers);
-    this.initializeMembersArray();
-  }
-  get membersFormArray(): FormArray {
-    return this.newExpense.get('members') as FormArray;
-  }
-
-  selectedGroupName = computed(() => {
-    return this.groups().find((g: Group) => g.id === this.preSelectedGroupId())
-      ?.name;
-  });
-  
-
+  // --- Submit & Close ---
   onSubmit(): void {
-    console.log('Submit triggered');
     if (this.newExpense.invalid) {
+      this.newExpense.markAllAsTouched();
       console.warn('Form invalid:', this.newExpense.value);
       return;
     }
 
+    if (!this.validateSplit()) {
+      alert('Split amounts do not match the total amount.');
+      return;
+    }
+
     const formValue = this.newExpense.value;
-    const formattedDate =
-      this.datePipe.transform(formValue.date, 'MMM d y') || '';
-    const groupId = formValue.selectedGroup || this.preSelectedGroupId();
+    const formattedDate = this.datePipe.transform(formValue.date, 'MMM d y') ?? '';
+    const groupId = formValue.selectedGroup ?? this.preSelectedGroupId();
+
     const selectedMembers = this.membersFormArray.controls
-      .filter((control) => control.get('selected')?.value)
-      .map((control) => ({
+      .filter(control => control.get('selected')?.value)
+      .map(control => ({
         id: control.get('id')?.value,
         email: control.get('email')?.value,
         amount: control.get('amount')?.value,
       }));
+
     if (selectedMembers.length === 0) {
-      alert('No members selected');
+      alert('No members selected.');
       return;
     }
 
     const expense: Expense = {
-      selectedGroup: this.groups().find((g) => g.id === groupId)?.name || '',
+      selectedGroup: this.groups().find(g => g.id === groupId)?.name ?? '',
       description: formValue.description,
       amount: formValue.amount,
       date: formattedDate,
-      category:
-        this.categories.find((c) => c.id === formValue.selectedCategory)
-          ?.category || '',
+      category: this.categories.find(c => c.id === formValue.selectedCategory)?.category ?? '',
       splitType: formValue.splitType,
       splitDetails: selectedMembers,
     };
@@ -261,7 +296,7 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
         this.expenseAdded.emit(expense);
         this.resetForm();
       },
-      error: (error) => console.error('Error adding expense:', error),
+      error: error => console.error('Error adding expense:', error),
     });
   }
 
@@ -270,16 +305,24 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
   }
 
   private resetForm(): void {
-    this.newExpense.reset({
-      splitType: 'equal',
-      selectedGroup: this.preSelectedGroupId() ?? null,
-    });
+    const currentGroup = this.newExpense.get('selectedGroup')?.value;
+  
+  this.newExpense.reset({
+    splitType: 'equal',
+    selectedGroup: currentGroup,
+    date: new Date()
+  });
 
-    if (this.preSelectedGroupId()) {
-      this.updateGroupMembers(this.preSelectedGroupId()!);
-    }
-    this.totalAmount.set(null);
+  // Force reinitialization of members
+  this.membersFormArray.clear();
+  if (currentGroup) {
+    this.updateGroupMembers(currentGroup);
+  }
 
+  // Reset signals and form state
+  this.totalAmount.set(null);
+  this.newExpense.markAsPristine();
+  this.newExpense.markAsUntouched();
     this.close.emit();
   }
 }
