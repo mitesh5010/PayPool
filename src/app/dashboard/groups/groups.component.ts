@@ -17,6 +17,7 @@ import { ApiService } from '../../Service/api.service';
 import { AddExpenseDialogComponent } from '../expenses/add-expense-dialog/add-expense-dialog.component';
 import { Group, User } from '../../Service/data.model';
 import { AuthService } from '../../auth/auth.service';
+import { ViewGroupComponent } from "./view-group/view-group.component";
 
 @Component({
   selector: 'app-groups',
@@ -31,7 +32,8 @@ import { AuthService } from '../../auth/auth.service';
     MultiSelectModule,
     ReactiveFormsModule,
     AddExpenseDialogComponent,
-  ],
+    ViewGroupComponent
+],
   templateUrl: './groups.component.html',
   styleUrl: './groups.component.css',
   encapsulation: ViewEncapsulation.None,
@@ -39,6 +41,7 @@ import { AuthService } from '../../auth/auth.service';
 export class GroupsComponent implements OnInit {
   groups!: Group[];
   showGroupDialog = false;
+  showViewGroupDialog = false;
   showExDialog = false;
   newGroup!: FormGroup;
   allMembers!: User[];
@@ -88,6 +91,10 @@ export class GroupsComponent implements OnInit {
   openExpenseDialog(groupId: number) {
     this.selectedGroupId = groupId;
     this.showExDialog = true;
+  }
+  openViewGroupDialog(groupId: number) {
+    this.selectedGroupId = groupId;
+    this.showViewGroupDialog = true;
   }
 
   addExpense(id: number) {

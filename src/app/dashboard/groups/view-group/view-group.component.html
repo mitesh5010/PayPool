@@ -1,0 +1,37 @@
+<p-dialog
+  header={{viewGroup()?.name}}
+  [visible]="visible()"
+  [modal]="true"
+  [closable]="true"
+  [style]="{ width: '600px' }"
+  [contentStyle]="{ 'overflow-y': 'auto', 'max-height': 'none' }"
+  [draggable]="false"
+>
+<form >
+  <div class="card">
+    <p-tabs [value]="1">
+        <p-tablist>
+            @for (tab of tabs; track tab.value) {
+                <p-tab [value]="tab.value">{{ tab.title }}</p-tab>
+            }
+        </p-tablist>
+        <p-tabpanels>
+            @for (tab of tabs; track tab.value) {
+                <p-tabpanel [value]="tab.value">
+                    <p class="m-0">{{ tab.content }}</p>
+                </p-tabpanel>
+            }
+        </p-tabpanels>
+    </p-tabs>
+</div>
+  <div class="flex justify-end gap-2 mt-4">
+      <button
+        pButton
+        type="button"
+        label="Cancel"
+        class="p-button-text"
+        (click)="onClose()"
+      ></button>
+  </div>
+</form>
+</p-dialog>
