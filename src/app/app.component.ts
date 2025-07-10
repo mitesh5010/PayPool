@@ -15,17 +15,7 @@ export class AppComponent implements OnInit{
   constructor(private auth: AuthService){}
 
   ngOnInit(): void {
-    const token = this.auth.getToken();
-    if (token) {
-      try {
-        const decoded = jwtDecode<DecodedToken>(token);
-        const user = decoded.user;
-        this.auth.userSignal.set(user);
-      } catch (error) {
-        console.error('Invalid token:', error);
-        this.auth.logout(); // optional fallback
-      }
-    }
+    this.auth.initializeUserFromToken();
   }
 
 }
