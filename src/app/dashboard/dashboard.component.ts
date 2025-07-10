@@ -23,7 +23,13 @@ export class DashboardComponent implements OnInit {
   constructor(private auth: AuthService){
   }
   ngOnInit(): void {
-    this.user = this.auth.userSignal() || JSON.parse(localStorage.getItem('user')!); 
+    const user = this.auth.userSignal();
+  if (user) {
+    this.user = user;
+  } else {
+    console.warn('No user loaded in signal');
+    this.auth.logout(); // optionally redirect if not logged in
+  } 
   }
   logout(){
     this.auth.logout();
