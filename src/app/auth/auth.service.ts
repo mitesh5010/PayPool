@@ -21,7 +21,12 @@ export class AuthService {
   if (token) {
     try {
       const decoded = jwtDecode<DecodedToken>(token);
-      this.userSignal.set(decoded.user);
+      const user: User = {
+        id: decoded.id,
+        email: decoded.email,
+        name: decoded.name
+      };
+      this.userSignal.set(user);
     } catch (error) {
       console.error('Failed to decode token', error);
       this.logout();

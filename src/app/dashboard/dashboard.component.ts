@@ -6,6 +6,7 @@ import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { ButtonModule } from 'primeng/button';
 import { AvatarModule } from 'primeng/avatar';
 import { CommonModule } from '@angular/common';
+import { User } from '../Service/data.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -19,7 +20,7 @@ import { CommonModule } from '@angular/common';
   encapsulation: ViewEncapsulation.None
 })
 export class DashboardComponent implements OnInit {
-  user!:{name:string, id:number, email:string};
+  user!:User;
   constructor(private auth: AuthService){
   }
   ngOnInit(): void {
