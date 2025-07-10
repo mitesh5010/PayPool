@@ -1,30 +1,208 @@
 <p-dialog
-  header={{viewGroup()?.name}}
+  header="{{ viewGroup()?.name }}"
   [visible]="visible()"
   [modal]="true"
   [closable]="true"
-  [style]="{ width: '600px' }"
-  [contentStyle]="{ 'overflow-y': 'auto', 'max-height': 'none' }"
+  [style]="{ width: '700px',height: '800px' }"
+  [contentStyle]="{ 'overflow-y': 'auto', 'height': '800px' }"
   [draggable]="false"
 >
-<form >
-  <div class="card">
-    <p-tabs [value]="1">
+  <form>
+    <div class="card">
+      <p-tabs [value]="1">
         <p-tablist>
-            @for (tab of tabs; track tab.value) {
-                <p-tab [value]="tab.value">{{ tab.title }}</p-tab>
-            }
+          @for (tab of tabs; track tab.value) {
+          <p-tab [value]="tab.value">{{ tab.title }}</p-tab>
+          }
         </p-tablist>
         <p-tabpanels>
-            @for (tab of tabs; track tab.value) {
-                <p-tabpanel [value]="tab.value">
-                    <p class="m-0">{{ tab.content }}</p>
-                </p-tabpanel>
-            }
+          @for (tab of tabs; track tab.value) {
+          <p-tabpanel [value]="tab.value">
+            <!-- <p class="m-0">{{ tab.content }}</p> -->
+            @switch (tab.value) { @case (1){
+            <!-- Premium Group Card Design -->
+            <div
+              class="surface-card border-round-xl shadow-4 overflow-hidden mb-4"
+            >
+              <!-- Group Header with Background -->
+              <div
+                class="relative p-4 text-white"
+                style="
+                  background: linear-gradient(
+                    135deg,
+                    var(--primary-color),
+                    var(--primary-600)
+                  );
+                "
+              >
+                <div class="flex justify-content-between align-items-start">
+                  <!-- Group Info -->
+                  <div class="flex flex-column gap-2">
+                    <div class="flex align-items-center gap-3">
+                      <div>
+                        <span class="text-black-alpha-30 text-sm"
+                          >{{ viewGroup()?.members?.length }} members</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Group Actions -->
+                  <div class="flex gap-2">
+                    <p-button
+                      icon="pi pi-cog"
+                      styleClass="p-button-text p-button-sm"
+                      pTooltip="Group Settings"
+                      tooltipPosition="left"
+                    >
+                    </p-button>
+
+                    <p-button
+                      icon="pi pi-ellipsis-v"
+                      styleClass="p-button-text p-button-sm"
+                      pTooltip="More Options"
+                      tooltipPosition="left"
+                    >
+                    </p-button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Group Statistics -->
+              <div class="p-4 border-bottom-1 surface-border">
+                <div class="grid">
+                  <div class="col-12 md:col-4">
+                    <div class="text-center p-3">
+                      <div class="text-3xl font-bold text-green-500 mb-2">
+                        ${{ 0 }}
+                      </div>
+                      <div class="text-sm text-600 uppercase font-semibold">
+                        Total Expenses
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-12 md:col-4">
+                    <div
+                      class="text-center p-3 border-left-1 border-right-1 surface-border"
+                    >
+                      <div class="text-3xl font-bold text-blue-500 mb-2">
+                        ${{ 0 }}
+                      </div>
+                      <div class="text-sm text-600 uppercase font-semibold">
+                        Your Share
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-12 md:col-4">
+                    <div class="text-center p-3">
+                      <div
+                        class="text-3xl font-bold mb-2"
+                        [class]="true ? 'text-green-500' : 'text-red-500'"
+                      >
+                        ${{ 0 }}
+                      </div>
+                      <div class="text-sm text-600 uppercase font-semibold">
+                        {{ true ? "You are owed" : "You owe" }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Recent Activity -->
+              <div class="p-4 border-bottom-1 surface-border">
+                <div
+                  class="flex justify-content-between align-items-center mb-3"
+                >
+                  <h6 class="m-0 font-semibold text-900">Recent Activity</h6>
+                  <p-button
+                    label="View All"
+                    styleClass="p-button-link p-button-sm"
+                    icon="pi pi-arrow-right"
+                    iconPos="right"
+                  >
+                  </p-button>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="p-4">
+                  <div class="grid">
+                    <div class="col-6 md:col-3">
+                      <p-button
+                        label="Add Expense"
+                        styleClass="p-button-outlined w-full"
+                        icon="pi pi-plus"
+                      >
+                      </p-button>
+                    </div>
+
+                    <div class="col-6 md:col-3">
+                      <p-button
+                        label="Settle Up"
+                        styleClass="p-button-success w-full"
+                        icon="pi pi-check"
+                      >
+                      </p-button>
+                    </div>
+
+                    <div class="col-6 md:col-3">
+                      <p-button
+                        label="View Balances"
+                        styleClass="p-button-outlined w-full"
+                        icon="pi pi-chart-bar"
+                      >
+                      </p-button>
+                    </div>
+
+                    <div class="col-6 md:col-3">
+                      <p-button
+                        label="Invite Member"
+                        styleClass="p-button-outlined w-full"
+                        icon="pi pi-user-plus"
+                      >
+                      </p-button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            } @case (2){ @for (member of viewGroup()?.members ?? []; track
+            member.id) {
+
+            <div class="surface-border border-1 border-round-lg p-3 mb-2">
+              <div class="flex justify-content-between align-items-center">
+                <!-- Compact Member Info -->
+                <div class="flex align-items-center gap-3">
+                  <p-avatar
+                    [label]="member.name.charAt(0)"
+                    styleClass="p-avatar-lg"
+                    shape="circle"
+                  >
+                  </p-avatar>
+
+                  <div>
+                    <div class="font-semibold text-900">{{ member.name }}</div>
+                    <div class="text-sm text-600">{{ member.email }}</div>
+                  </div>
+                </div>
+
+                <!-- Compact Amount -->
+                <div class="font-bold text-lg text-primary">pending : $500</div>
+              </div>
+            </div>
+            } } @case (3){
+            <p>Expenses specific content</p>
+            } @default {
+            <p>Default content for other tabs</p>
+            } }
+          </p-tabpanel>
+          }
         </p-tabpanels>
-    </p-tabs>
-</div>
-  <div class="flex justify-end gap-2 mt-4">
+      </p-tabs>
+    </div>
+    <div class="flex justify-end gap-2 mt-4">
       <button
         pButton
         type="button"
@@ -32,6 +210,6 @@
         class="p-button-text"
         (click)="onClose()"
       ></button>
-  </div>
-</form>
+    </div>
+  </form>
 </p-dialog>
