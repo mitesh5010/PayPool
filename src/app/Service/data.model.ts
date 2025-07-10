@@ -1,5 +1,4 @@
-export interface DecodedToken {
-  user: User;
+export interface DecodedToken extends User{
   iat: number;
   exp: number;
 }
