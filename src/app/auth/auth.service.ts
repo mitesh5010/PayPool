@@ -32,7 +32,7 @@ export class AuthService {
   login(email:string, password:string){
     return this.http.post(`${this.api}/login`, { email, password }).pipe(
       tap( (res : any) =>{
-        localStorage.setItem('token',res.accessToken);
+        localStorage.setItem('token',res.token);
         this.userSignal.set(res.user)
       })
     )
@@ -48,6 +48,10 @@ export class AuthService {
 
   getToken() {
     return localStorage.getItem('token');
+  }
+  getUserId(): number {
+    const user = this.userSignal();
+    return user ? user.id : 0;
   }
 
   isLoggedIn() {

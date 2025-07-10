@@ -6,6 +6,7 @@ import {  FormGroup } from '@angular/forms';
 import { ApiService} from '../../Service/api.service';
 import { AddExpenseDialogComponent } from "./add-expense-dialog/add-expense-dialog.component";
 import { Category, Expense, Group, User } from '../../Service/data.model';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-expenses',
@@ -23,12 +24,16 @@ export class ExpensesComponent implements OnInit {
   users!: User[];
   groupMembers!: User[];
   
-  constructor(private apiService: ApiService){}
+  constructor(private apiService: ApiService, private auth: AuthService){}
 
   ngOnInit(): void {
+    const userId = this.auth.getUserId();
     this.apiService.getAllExpenses().subscribe({
     next: (data) => {
-      this.expenses = data.slice().reverse();
+      this.expenses = data.filter(exp =>
+          exp.splitDetails.some(split => split.id === userId)
+        )
+        .reverse();
     },
     error: (err) => {
       console.error('Failed to load expenses:', err);

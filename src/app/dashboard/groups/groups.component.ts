@@ -16,6 +16,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { ApiService } from '../../Service/api.service';
 import { AddExpenseDialogComponent } from '../expenses/add-expense-dialog/add-expense-dialog.component';
 import { Group, User } from '../../Service/data.model';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-groups',
@@ -43,14 +44,19 @@ export class GroupsComponent implements OnInit {
   allMembers!: User[];
   id!: number;
   selectedGroupId: number = 0;
+  userId: number = 0;
 
-  constructor(private fb: FormBuilder, private apiService: ApiService) {}
+  constructor(private fb: FormBuilder, private apiService: ApiService, private auth: AuthService) {}
 
   ngOnInit() {
     // Replace with real service call
+    this.userId = this.auth.getUserId();
     this.apiService.getAllGroups().subscribe({
       next: (data) => {
-        this.groups = data.slice().reverse();
+        const allGroups = data.slice().reverse();
+        this.groups = allGroups.filter(
+          (group) => group.userId === this.userId || group.members.some((m) => m.id === this.userId)
+        );
       },
       error: (err) => {
         console.error('Failed to load groups:', err);
@@ -70,11 +76,12 @@ export class GroupsComponent implements OnInit {
       members: [[], Validators.required],
     });
   }
-  getUserId(): number {
-    const user = localStorage.getItem('user');
-    return user ? JSON.parse(user).id : 0;
-  }
-
+  filterUserGroups(allGroups: Group[], userId: number): Group[] {
+  return allGroups.filter(group =>
+    group.userId === userId || group.members.some(member => member.id === userId)
+  );
+}
+  
   viewGroup(id: number) {
     // Navigate to group details
   }
@@ -95,7 +102,7 @@ export class GroupsComponent implements OnInit {
         name: formValue.name,
         description: formValue.description || '',
         status: 'ACTIVE',
-        userId: this.getUserId(),
+        userId: this.userId,
         members: formValue.members.map((member: User) => ({
           id: member.id,
           name: member.name,
