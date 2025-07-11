@@ -15,12 +15,12 @@
               <span>•</span>
               <span>{{ expense.category }}</span>
               <span>•</span>
-              <span>Split by {{ expense.splitType }}</span>
+              <span>Paid By {{ getName(expense.paidBy) }}</span>
             </div>
           </div>
         </div>
-        <div class="p-text-right" style="min-width: 90px;">
-          <div class="p-font-semibold" [ngClass]="expense.splitType === 'equal' ? 'p-text-green-600' : 'p-text-blue-600'" style="font-size: 1.1rem;">
+        <div class="text-right" style="min-width: 90px;">
+          <div class="p-font-semibold" [ngClass]="getName(expense.paidBy) === 'You' ? 'text-green-600' : 'text-red-600'" style="font-size: 1.1rem;">
             ₹{{ expense.amount }}
           </div>
           <div class="p-text-500 p-text-sm">{{ expense.date }}</div>

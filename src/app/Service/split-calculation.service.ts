@@ -21,15 +21,14 @@ export class SplitCalculationService {
     groupExpenses.forEach(exp => {
       total += exp.amount;
 
-      const splitTotal = exp.splitDetails.reduce((sum, s) => sum + s.amount, 0);
       const userSplit = exp.splitDetails.find(s => s.id === userId)?.amount || 0;
 
       // You didn't pay, but owe part of it
-      if (userSplit > 0 && group.userId !== userId) {
+      if (userSplit > 0 && exp.paidBy !== userId) {
         youOwe += userSplit;
       }
       // You paid (you are the creator), others owe you
-      if (group.userId === userId) {
+      if (exp.paidBy === userId) {
         exp.splitDetails.forEach(split => {
           if (split.id !== userId) {
             owedToYou += split.amount;

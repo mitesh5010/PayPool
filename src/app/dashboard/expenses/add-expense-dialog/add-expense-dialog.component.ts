@@ -108,7 +108,7 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
   private initializeForm(): void {
     this.newExpense = this.fb.group({
       description: ['', Validators.required],
-      date: ['', Validators.required],
+      date: [new Date(), Validators.required],
       amount: [null, [Validators.required, Validators.min(0.01)]],
       selectedGroup: [this.preSelectedGroupId() ?? null, Validators.required],
       splitType: ['equal'],
