@@ -10,7 +10,7 @@
 >
   <form>
     <div class="card">
-      <p-tabs [value]="2">
+      <p-tabs [value]="1">
         <p-tablist>
           @for (tab of tabs; track tab.value) {
           <p-tab [value]="tab.value">{{ tab.title }}</p-tab>
@@ -20,33 +20,8 @@
           @for (tab of tabs; track tab.value) {
           <p-tabpanel [value]="tab.value">
             <!-- <p class="m-0">{{ tab.content }}</p> -->
-            @switch (tab.value) { @case (1){
-            <p>Overview Content</p>
-            } @case (2){ @for (member of viewGroup()?.members ?? []; track
-            member.id) {
-
-            <div class="surface-border border-1 border-round-lg p-3 mb-2">
-              <div class="flex justify-content-between align-items-center">
-                <!-- Compact Member Info -->
-                <div class="flex align-items-center gap-3">
-                  <p-avatar
-                    [label]="member.name.charAt(0)"
-                    styleClass="p-avatar-lg"
-                    shape="circle"
-                  >
-                  </p-avatar>
-
-                  <div>
-                    <div class="font-semibold text-900">{{ member.name }}</div>
-                    <div class="text-sm text-600">{{ member.email }}</div>
-                  </div>
-                </div>
-
-                <!-- Compact Amount -->
-                <div class="font-bold text-lg text-primary">pending : $500</div>
-              </div>
-            </div>
-            } } @case (3){ @for (expense of filteredExpenses(); track $index) {
+            @switch (tab.value) { 
+              @case (1){ @for (expense of filteredExpenses(); track $index) {
             <p-card class="mb-4 shadow-3 border-round-lg overflow-hidden m-1">
               <!-- Info Section -->
               <div
@@ -123,7 +98,7 @@
                       <div class="flex align-items-center flex-1">
                         <div class="flex-1">
                           <div class="text-sm font-semibold text-gray-800 mb-1">
-                            {{ "mitesh" }}
+                            {{ getUserName(split) }}
                           </div>
                           <div class="text-xs text-gray-500">
                             {{ split.email }}
@@ -143,7 +118,33 @@
                 }
               </div>
             </p-card>
-            } } @default {
+            } }
+               @case (2){ @for (member of viewGroup()?.members ?? []; track
+            member.id) {
+
+            <div class="surface-border border-1 border-round-lg p-3 mb-2">
+              <div class="flex justify-content-between align-items-center">
+                <!-- Compact Member Info -->
+                <div class="flex align-items-center gap-3">
+                  <p-avatar
+                    [label]="member.name.charAt(0)"
+                    styleClass="p-avatar-lg"
+                    shape="circle"
+                  >
+                  </p-avatar>
+
+                  <div>
+                    <div class="font-semibold text-900">{{ member.name }}</div>
+                    <div class="text-sm text-600">{{ member.email }}</div>
+                  </div>
+                </div>
+
+                <!-- Compact Amount -->
+                <div class="font-bold text-lg text-primary">pending : $500</div>
+              </div>
+            </div>
+            } }  
+            @default {
             <p>Default content for other tabs</p>
             } }
           </p-tabpanel>
