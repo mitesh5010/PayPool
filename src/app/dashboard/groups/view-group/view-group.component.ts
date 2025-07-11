@@ -41,7 +41,6 @@ export class ViewGroupComponent implements OnInit {
     return this.groups().find(group => group.id === this.groupId()) || null;
    })
 
-
   onClose() {
     this.close.emit();
   }
