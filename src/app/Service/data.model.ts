@@ -22,6 +22,7 @@ export interface Expense {
   category: string;
   splitType: 'equal' | 'manual';
   splitDetails: SplitDetail[];
+  paidBy: number;
 }
 
 export interface Category{

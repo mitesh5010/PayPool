@@ -31,6 +31,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { ApiService } from '../../../Service/api.service';
 import { Category, Expense, Group, User } from '../../../Service/data.model';
 import { distinctUntilChanged } from 'rxjs';
+import { AuthService } from '../../../auth/auth.service';
 
 @Component({
   selector: 'app-add-expense-dialog',
@@ -66,6 +67,7 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
   newExpense!: FormGroup;
   categories: Category[] = [];
   groupMembers: User[] = [];
+  userId!:number;
 
   readonly splitOptions = [
     { label: 'Equally', value: 'equal' },
@@ -77,12 +79,14 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
   constructor(
     private fb: FormBuilder,
     private datePipe: DatePipe,
-    private api: ApiService
+    private api: ApiService,
+    private auth: AuthService
   ) {}
 
   ngOnInit(): void {
     this.initializeForm();
     this.loadCategories();
+    this.userId = this.auth.getUserId();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -289,6 +293,7 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
       category: this.categories.find(c => c.id === formValue.selectedCategory)?.category ?? '',
       splitType: formValue.splitType,
       splitDetails: selectedMembers,
+      paidBy: this.userId,
     };
 
     this.api.addExpense(expense).subscribe({
