@@ -10,7 +10,7 @@
 >
   <form>
     <div class="card">
-      <p-tabs [value]="1">
+      <p-tabs [value]="2">
         <p-tablist>
           @for (tab of tabs; track tab.value) {
           <p-tab [value]="tab.value">{{ tab.title }}</p-tab>
@@ -20,138 +20,8 @@
           @for (tab of tabs; track tab.value) {
           <p-tabpanel [value]="tab.value">
             <!-- <p class="m-0">{{ tab.content }}</p> -->
-            @switch (tab.value) { 
-              @case (1){
-            <!-- Premium Group Card Design -->
-            <div class="surface-card border-round-xl shadow-2">
-              <!-- Group Header with Background -->
-              <div
-                class="relative p-3 text-white"
-                style="
-                  background: linear-gradient(
-                    135deg,
-                    var(--primary-color),
-                    var(--primary-600)
-                  );
-                "
-              >
-                <div class="flex justify-content-between align-items-start">
-                  <!-- Group Info -->
-                  <div class="flex flex-column gap-2">
-                    <div class="flex align-items-center gap-3">
-                      <div>
-                        <span class="text-black-alpha-30 text-sm"
-                          >{{ viewGroup()?.members?.length }} members</span
-                        >
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Group Actions -->
-                  <div class="flex gap-2">
-                    <p-button
-                      icon="pi pi-cog"
-                      styleClass="p-button-text p-button-sm"
-                      pTooltip="Group Settings"
-                      tooltipPosition="left"
-                    >
-                    </p-button>
-
-                    <p-button
-                      icon="pi pi-ellipsis-v"
-                      styleClass="p-button-text p-button-sm"
-                      pTooltip="More Options"
-                      tooltipPosition="left"
-                    >
-                    </p-button>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Group Statistics -->
-              <div class="p-2 border-bottom-1 surface-border">
-                <div class="grid">
-                  <div class="col-12 md:col-4">
-                    <div class="text-center p-3">
-                      <div class="text-3xl font-bold text-gray-500 mb-2">
-                        ${{ 0 }}
-                      </div>
-                      <div class="text-sm text-600 uppercase font-semibold">
-                        Total Expenses
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="col-12 md:col-4">
-                    <div
-                      class="text-center p-3 border-left-1 border-right-1 surface-border"
-                    >
-                      <div class="text-3xl font-bold text-blue-500 mb-2">
-                        ${{ 0 }}
-                      </div>
-                      <div class="text-sm text-600 uppercase font-semibold">
-                        Your Share
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="col-12 md:col-4">
-                    <div class="text-center p-3">
-                      <div
-                        class="text-3xl font-bold mb-2"
-                        [class]="true ? 'text-green-500' : 'text-red-500'"
-                      >
-                        ${{ 0 }}
-                      </div>
-                      <div class="text-sm text-600 uppercase font-semibold">
-                        {{ true ? "You are owed" : "You owe" }}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Recent Activity -->
-              <div class="p-4 border-bottom-1 surface-border">
-                <div
-                  class="flex justify-content-between align-items-center mb-3"
-                >
-                  <h6 class="m-0 font-semibold text-900">Recent Activity</h6>
-                  <p-button
-                    label="View All"
-                    styleClass="p-button-link p-button-sm"
-                    icon="pi pi-arrow-right"
-                    iconPos="right"
-                  >
-                  </p-button>
-                </div>
-
-                <!-- Quick Actions -->
-                <div class="p-2">
-                  <div class="flex gap-3 flex-wrap justify-content-center">
-                    <p-button
-                      label="Add Expense"
-                      styleClass="p-button-outlined w-full"
-                      icon="pi pi-plus"
-                    >
-                    </p-button>
-
-                    <p-button
-                      label="Settle Up"
-                      styleClass="p-button-success w-full"
-                      icon="pi pi-check"
-                    >
-                    </p-button>
-                    <p-button
-                      label="Invite Member"
-                      styleClass="p-button-outlined w-full"
-                      icon="pi pi-user-plus"
-                    >
-                    </p-button>
-                  </div>
-                </div>
-              </div>
-            </div>
+            @switch (tab.value) { @case (1){
+            <p>Overview Content</p>
             } @case (2){ @for (member of viewGroup()?.members ?? []; track
             member.id) {
 
@@ -177,7 +47,7 @@
               </div>
             </div>
             } } @case (3){ @for (expense of filteredExpenses(); track $index) {
-              <p-card class="mb-4 shadow-3 border-round-lg overflow-hidden m-1">
+            <p-card class="mb-4 shadow-3 border-round-lg overflow-hidden m-1">
               <!-- Info Section -->
               <div
                 class="flex justify-between align-items-center mb-2 p-2 bg-gray-50 border-round-lg"
@@ -202,7 +72,7 @@
                       {{ expense.description }}
                     </div>
                     <div
-                      class="flex align-items-start text-sm text-primary-700 "
+                      class="flex align-items-start text-sm text-primary-700"
                     >
                       <span
                         class="bg-primary-100 text-primary-800 px-2 py-1 text-xs font-medium"
@@ -212,7 +82,7 @@
                     </div>
                   </div>
                   <div class="text-right ml-4">
-                    <div class="text-3xl font-bold  mb-1">
+                    <div class="text-3xl font-bold mb-1">
                       {{
                         expense.amount | currency : "INR" : "symbol" : "1.2-2"
                       }}
@@ -232,15 +102,12 @@
                 </div>
               </div>
 
-
               <!-- Split Details Header -->
               <div class="flex align-items-center justify-between mb-2">
                 <h4 class="text-lg font-semibold text-gray-800 m-0">
-                  Split Details - 
+                  Split Details -
                 </h4>
-                <div
-                  class="text-xs text-gray-500 bg-gray-100 px-2 py-1 "
-                >
+                <div class="text-xs text-gray-500 bg-gray-100 px-2 py-1">
                   {{ expense.splitDetails.length }} participants
                 </div>
               </div>
@@ -256,10 +123,10 @@
                       <div class="flex align-items-center flex-1">
                         <div class="flex-1">
                           <div class="text-sm font-semibold text-gray-800 mb-1">
-                            {{ 'mitesh' }}
+                            {{ "mitesh" }}
                           </div>
                           <div class="text-xs text-gray-500">
-                            {{ split.email}}
+                            {{ split.email }}
                           </div>
                         </div>
                       </div>
@@ -285,12 +152,26 @@
       </p-tabs>
     </div>
   </form>
-  <ng-template pTemplate="footer" class="border-top-style-solid">
-    <button
-      pButton
-      label="Close"
-      class="button-text bg-white text-black-alpha-80 "
-      (click)="onClose()"
-    ></button>
+  <ng-template pTemplate="footer">
+    <div class="flex gap-3 flex-wrap justify-content-center">
+      <p-button
+        label="Settle Up"
+        styleClass="p-button-success w-full"
+        icon="pi pi-check"
+      >
+      </p-button>
+      <p-button
+        label="Add Member"
+        styleClass="p-button-outlined w-full"
+        icon="pi pi-user-plus"
+      >
+      </p-button>
+      <button
+        pButton
+        label="Close"
+        class="button-text bg-white text-black-alpha-80"
+        (click)="onClose()"
+      ></button>
+    </div>
   </ng-template>
 </p-dialog>
