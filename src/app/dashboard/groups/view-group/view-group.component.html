@@ -6,6 +6,7 @@
   [style]="{ width: '700px',height: '800px' }"
   [contentStyle]="{ 'overflow-y': 'auto', 'height': '800px' }"
   [draggable]="false"
+  (onHide)="onClose()"
 >
   <form>
     <div class="card">
@@ -22,11 +23,11 @@
             @switch (tab.value) { @case (1){
             <!-- Premium Group Card Design -->
             <div
-              class="surface-card border-round-xl shadow-4 overflow-hidden mb-4"
+              class="surface-card border-round-xl shadow-2"
             >
               <!-- Group Header with Background -->
               <div
-                class="relative p-4 text-white"
+                class="relative p-3 text-white"
                 style="
                   background: linear-gradient(
                     135deg,
@@ -69,11 +70,11 @@
               </div>
 
               <!-- Group Statistics -->
-              <div class="p-4 border-bottom-1 surface-border">
+              <div class="p-2 border-bottom-1 surface-border">
                 <div class="grid">
                   <div class="col-12 md:col-4">
                     <div class="text-center p-3">
-                      <div class="text-3xl font-bold text-green-500 mb-2">
+                      <div class="text-3xl font-bold text-gray-500 mb-2">
                         ${{ 0 }}
                       </div>
                       <div class="text-sm text-600 uppercase font-semibold">
@@ -127,43 +128,29 @@
                 </div>
 
                 <!-- Quick Actions -->
-                <div class="p-4">
-                  <div class="grid">
-                    <div class="col-6 md:col-3">
+                <div class="p-2">
+                  <div class="flex gap-3 flex-wrap justify-content-center">
+                  
                       <p-button
                         label="Add Expense"
                         styleClass="p-button-outlined w-full"
                         icon="pi pi-plus"
                       >
                       </p-button>
-                    </div>
 
-                    <div class="col-6 md:col-3">
                       <p-button
                         label="Settle Up"
                         styleClass="p-button-success w-full"
                         icon="pi pi-check"
                       >
                       </p-button>
-                    </div>
-
-                    <div class="col-6 md:col-3">
-                      <p-button
-                        label="View Balances"
-                        styleClass="p-button-outlined w-full"
-                        icon="pi pi-chart-bar"
-                      >
-                      </p-button>
-                    </div>
-
-                    <div class="col-6 md:col-3">
                       <p-button
                         label="Invite Member"
                         styleClass="p-button-outlined w-full"
                         icon="pi pi-user-plus"
                       >
                       </p-button>
-                    </div>
+            
                   </div>
                 </div>
               </div>
@@ -202,14 +189,14 @@
         </p-tabpanels>
       </p-tabs>
     </div>
-    <div class="flex justify-end gap-2 mt-4">
-      <button
-        pButton
-        type="button"
-        label="Cancel"
-        class="p-button-text"
-        (click)="onClose()"
-      ></button>
-    </div>
+    
   </form>
+  <ng-template pTemplate="footer">
+    <button 
+      pButton 
+      label="Close" 
+      class="p-button-text" 
+      (click)="onClose()"
+    ></button>
+  </ng-template>
 </p-dialog>
