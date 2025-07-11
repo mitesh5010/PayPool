@@ -15,7 +15,7 @@ import { InputText } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { ApiService } from '../../Service/api.service';
 import { AddExpenseDialogComponent } from '../expenses/add-expense-dialog/add-expense-dialog.component';
-import { Group, User } from '../../Service/data.model';
+import { Expense, Group, User } from '../../Service/data.model';
 import { AuthService } from '../../auth/auth.service';
 import { ViewGroupComponent } from "./view-group/view-group.component";
 
@@ -48,6 +48,7 @@ export class GroupsComponent implements OnInit {
   id!: number;
   selectedGroupId: number = 0;
   userId: number = 0;
+  allExpenses!:Expense[];
 
   constructor(private fb: FormBuilder, private apiService: ApiService, private auth: AuthService) {}
 
@@ -65,6 +66,13 @@ export class GroupsComponent implements OnInit {
         console.error('Failed to load groups:', err);
       },
     });
+    this.apiService.getAllExpenses().subscribe({
+      next: data => {
+        this.allExpenses = data
+      },
+      error: err => console.log('error! for expenses get:',err)
+      
+    })
     this.apiService.getAllUsers().subscribe({
       next: (data) => {
         this.allMembers = data;
