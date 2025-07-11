@@ -8,6 +8,10 @@ import { AddExpenseDialogComponent } from "./add-expense-dialog/add-expense-dial
 import { Category, Expense, Group, User } from '../../Service/data.model';
 import { AuthService } from '../../auth/auth.service';
 
+interface NameUser extends User {
+  name: string
+}
+
 @Component({
   selector: 'app-expenses',
   imports: [CommonModule, CardModule, ButtonModule, AddExpenseDialogComponent],
@@ -21,17 +25,18 @@ export class ExpensesComponent implements OnInit {
   expenses:Expense[]=[];
   categories!:Category[];
   groups!: Group[];
-  users!: User[];
+  users!:NameUser[];
   groupMembers!: User[];
+  userId!:number;
   
   constructor(private apiService: ApiService, private auth: AuthService){}
 
   ngOnInit(): void {
-    const userId = this.auth.getUserId();
+    this.userId = this.auth.getUserId();
     this.apiService.getAllExpenses().subscribe({
     next: (data) => {
       this.expenses = data.filter(exp =>
-          exp.splitDetails.some(split => split.id === userId)
+          exp.splitDetails.some(split => split.id === this.userId)
         )
         .reverse();
     },
@@ -68,6 +73,15 @@ export class ExpensesComponent implements OnInit {
     }
   });
     
+  }
+
+  getName(id:number){
+    if (this.userId === id) {
+      return "You"
+    } else {
+      const user = this.users.find(u => u.id === id);
+      return user ? user.name : '';
+    } 
   }
 
   
