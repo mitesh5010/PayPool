@@ -1,13 +1,17 @@
 import { Component, computed, effect, input, OnInit, output, signal } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { Dialog } from "primeng/dialog";
-import { Group } from '../../../Service/data.model';
+import { Expense, Group } from '../../../Service/data.model';
 import { TabsModule } from 'primeng/tabs';
 import { AvatarModule } from 'primeng/avatar';
+import { DividerModule } from 'primeng/divider';
+import { CurrencyPipe } from '@angular/common';
+import { CardModule } from 'primeng/card';
+import { BadgeModule } from 'primeng/badge';
 
 @Component({
   selector: 'app-view-group',
-  imports: [Dialog,ButtonModule,TabsModule, AvatarModule],
+  imports: [Dialog,ButtonModule,TabsModule, AvatarModule, DividerModule, CurrencyPipe, CardModule, BadgeModule],
   templateUrl: './view-group.component.html',
   styleUrl: './view-group.component.css'
 })
@@ -17,6 +21,8 @@ export class ViewGroupComponent implements OnInit {
    readonly groups = input<Group[]>([]);
    readonly groupId = input<number | null>(null);
    viewGroup =signal<Group | null>(null);
+   readonly allExpenses = input<Expense[]>([]);
+
 
    tabs: { value: number, title: string }[] = [];
 
@@ -32,6 +38,9 @@ export class ViewGroupComponent implements OnInit {
        { value: 2, title: 'Members' },
        { value: 3, title: 'Expenses'}
      ];
+   }
+   filteredExpenses(){
+    return this.allExpenses().filter(e => e.selectedGroup === this.viewGroup()?.name)
    }
 
    selectedGroup = computed(()=>{

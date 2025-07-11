@@ -3,8 +3,8 @@
   [visible]="visible()"
   [modal]="true"
   [closable]="true"
-  [style]="{ width: '700px',height: '800px' }"
-  [contentStyle]="{ 'overflow-y': 'auto', 'height': '800px' }"
+  [style]="{ width: '700px', height: '800px' }"
+  [contentStyle]="{ 'overflow-y': 'auto', height: '800px' }"
   [draggable]="false"
   (onHide)="onClose()"
 >
@@ -20,11 +20,10 @@
           @for (tab of tabs; track tab.value) {
           <p-tabpanel [value]="tab.value">
             <!-- <p class="m-0">{{ tab.content }}</p> -->
-            @switch (tab.value) { @case (1){
+            @switch (tab.value) { 
+              @case (1){
             <!-- Premium Group Card Design -->
-            <div
-              class="surface-card border-round-xl shadow-2"
-            >
+            <div class="surface-card border-round-xl shadow-2">
               <!-- Group Header with Background -->
               <div
                 class="relative p-3 text-white"
@@ -130,27 +129,25 @@
                 <!-- Quick Actions -->
                 <div class="p-2">
                   <div class="flex gap-3 flex-wrap justify-content-center">
-                  
-                      <p-button
-                        label="Add Expense"
-                        styleClass="p-button-outlined w-full"
-                        icon="pi pi-plus"
-                      >
-                      </p-button>
+                    <p-button
+                      label="Add Expense"
+                      styleClass="p-button-outlined w-full"
+                      icon="pi pi-plus"
+                    >
+                    </p-button>
 
-                      <p-button
-                        label="Settle Up"
-                        styleClass="p-button-success w-full"
-                        icon="pi pi-check"
-                      >
-                      </p-button>
-                      <p-button
-                        label="Invite Member"
-                        styleClass="p-button-outlined w-full"
-                        icon="pi pi-user-plus"
-                      >
-                      </p-button>
-            
+                    <p-button
+                      label="Settle Up"
+                      styleClass="p-button-success w-full"
+                      icon="pi pi-check"
+                    >
+                    </p-button>
+                    <p-button
+                      label="Invite Member"
+                      styleClass="p-button-outlined w-full"
+                      icon="pi pi-user-plus"
+                    >
+                    </p-button>
                   </div>
                 </div>
               </div>
@@ -179,9 +176,107 @@
                 <div class="font-bold text-lg text-primary">pending : $500</div>
               </div>
             </div>
-            } } @case (3){
-            <p>Expenses specific content</p>
-            } @default {
+            } } @case (3){ @for (expense of filteredExpenses(); track $index) {
+              <p-card class="mb-4 shadow-3 border-round-lg overflow-hidden m-1">
+              <!-- Info Section -->
+              <div
+                class="flex justify-between align-items-center mb-2 p-2 bg-gray-50 border-round-lg"
+              >
+                <div class="flex align-items-center text-gray-700">
+                  <div class="bg-blue-100 p-2 border-round-full mr-3">
+                    <i class="pi pi-calendar text-blue-600"></i>
+                  </div>
+                  <div>
+                    <div class="text-xs text-gray-500 font-medium">Date</div>
+                    <div class="text-sm font-semibold">{{ expense.date }}</div>
+                  </div>
+                </div>
+              </div>
+              <!-- Header Section with Gradient Background -->
+              <div
+                class="bg-gradient-to-r from-primary-50 to-primary-100 p-3 -m-2"
+              >
+                <div class="flex justify-between align-items-start">
+                  <div class="flex-1">
+                    <div class="text-2xl font-bold text-primary mb-1">
+                      {{ expense.description }}
+                    </div>
+                    <div
+                      class="flex align-items-start text-sm text-primary-700 "
+                    >
+                      <span
+                        class="bg-primary-100 text-primary-800 px-2 py-1 text-xs font-medium"
+                      >
+                        {{ expense.category }}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="text-right ml-4">
+                    <div class="text-3xl font-bold  mb-1">
+                      {{
+                        expense.amount | currency : "INR" : "symbol" : "1.2-2"
+                      }}
+                    </div>
+                    <p-badge
+                      [value]="
+                        expense.splitType === 'equal'
+                          ? 'Equal Split'
+                          : 'Manual Split'
+                      "
+                      [severity]="
+                        expense.splitType === 'equal' ? 'success' : 'info'
+                      "
+                      class="text-xs"
+                    ></p-badge>
+                  </div>
+                </div>
+              </div>
+
+
+              <!-- Split Details Header -->
+              <div class="flex align-items-center justify-between mb-2">
+                <h4 class="text-lg font-semibold text-gray-800 m-0">
+                  Split Details - 
+                </h4>
+                <div
+                  class="text-xs text-gray-500 bg-gray-100 px-2 py-1 "
+                >
+                  {{ expense.splitDetails.length }} participants
+                </div>
+              </div>
+
+              <!-- Split Details Grid -->
+              <div class="grid grid-nogutter gap-1">
+                @for (split of expense.splitDetails; track split.id) {
+                <div class="col-12 md:col-6">
+                  <div
+                    class="bg-white border-1 surface-border border-round-lg p-2 hover:shadow-2 transition-all transition-duration-200"
+                  >
+                    <div class="flex align-items-center justify-between">
+                      <div class="flex align-items-center flex-1">
+                        <div class="flex-1">
+                          <div class="text-sm font-semibold text-gray-800 mb-1">
+                            {{ 'mitesh' }}
+                          </div>
+                          <div class="text-xs text-gray-500">
+                            {{ split.email}}
+                          </div>
+                        </div>
+                      </div>
+                      <div class="text-right">
+                        <div class="text-lg font-bold text-gray-600">
+                          {{
+                            split.amount | currency : "INR" : "symbol" : "1.2-2"
+                          }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                }
+              </div>
+            </p-card>
+            } } @default {
             <p>Default content for other tabs</p>
             } }
           </p-tabpanel>
@@ -189,13 +284,12 @@
         </p-tabpanels>
       </p-tabs>
     </div>
-    
   </form>
-  <ng-template pTemplate="footer">
-    <button 
-      pButton 
-      label="Close" 
-      class="p-button-text" 
+  <ng-template pTemplate="footer" class="border-top-style-solid">
+    <button
+      pButton
+      label="Close"
+      class="button-text bg-white text-black-alpha-80 "
       (click)="onClose()"
     ></button>
   </ng-template>
