@@ -1,0 +1,196 @@
+<p-dialog
+  header="Add New Expense"
+  [visible]="visible()"
+  [modal]="true"
+  [closable]="false"
+  [style]="{ width: '600px' }"
+  [contentStyle]="{ 'overflow-y': 'auto', 'max-height': 'none' }"
+  [draggable]="false"
+  [styleClass]="'custom-modal'"
+>
+  @if (newExpense) {
+
+  <form
+    [formGroup]="newExpense"
+    (ngSubmit)="onSubmit()"
+    class="flex flex-column gap-2 p-2"
+  >
+    @if (preSelectedGroupId()) {
+    <label class="block text-xl font-medium mb-1 m-auto">
+      {{ selectedGroupName() }}
+    </label>
+    } @else {
+    <div>
+      <label class="block text-sm font-medium mb-1">Group</label>
+      <p-select
+        formControlName="selectedGroup"
+        [options]="groups()"
+        optionLabel="name"
+        optionValue="id"
+        placeholder="Select Group"
+        class="w-full md:w-56"
+      />
+    </div>
+    }
+    <div>
+      <label class="block text-sm font-medium mb-1">Description</label>
+      <input
+        pInputText
+        class="w-full"
+        formControlName="description"
+        placeholder="What's this expense for?"
+      />
+    </div>
+    <div class="flex flex-row gap-3">
+      <div>
+        <label class="block text-sm font-medium mb-1">Amount</label>
+        <p-inputnumber
+          formControlName="amount"
+          mode="currency"
+          inputId="currency-india"
+          currency="INR"
+          placeholder="Amount"
+          currencyDisplay="code"
+          locale="en-IN"
+        />
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Date</label>
+        <p-datepicker
+          formControlName="date"
+          dateFormat="dd-mm-yy"
+          placeholder="Select Date"
+        />
+      </div>
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Category</label>
+      <p-select
+        formControlName="selectedCategory"
+        [options]="categories"
+        optionLabel="category"
+        optionValue="id"
+        placeholder="Select"
+        class="w-full md:w-56"
+      />
+    </div>
+    <div class="">
+      <label class="block text-sm font-medium mb-1">Split Type</label>
+      <p-selectButton
+        [options]="splitOptions"
+        formControlName="splitType"
+        optionLabel="label"
+        optionValue="value"
+      />
+    </div>
+    <p-divider class="m-0" />
+
+    <div>
+      <label class="block text-sm font-medium mb-1">Members</label>
+      <!-- for multiselect dropdown -->
+      <!-- <p-multiSelect
+        [options]="groupMembers"
+        formControlName="selectedMembers"
+        optionLabel="name"
+        display="chip"
+        [showToggleAll]="false"
+        [filter]="true"
+        [showHeader]="false"
+        [selectedItemsLabel]="'{0} selected'"
+        [panelStyle]="{
+          'min-width': '220px',
+          'max-height': '210px',
+          'overflow-y': 'auto'
+          }"
+          class="w-full"
+          [showClear]="true"
+          [virtualScroll]="true"
+          [virtualScrollItemSize]="38"
+          checkbox="true"
+          [appendTo]="'body'"
+          placeholder="Select Members"
+          ></p-multiSelect> -->
+      <!-- <div class="selected-members mt-3">
+            @for (member of newExpense.get('selectedMembers')?.value; track $index)
+            {
+              <div
+          class="flex align-items-center justify-content-between p-2 border-bottom-1 surface-border"
+        >
+          <span>{{ member.name }}</span>
+          <span class="font-bold">11.00</span>
+        </div>
+        }
+      </div> -->
+
+      @if (newExpense.get('splitType')?.value === 'manual') {
+      <span
+        class="text-sm"
+        [class.text-green-500]="validateSplit()"
+        [class.text-red-500]="!validateSplit()"
+      >
+        {{ validateSplit() ? "Amounts match" : "Amounts do not match total" }}
+      </span>
+      }
+      <div class="selected-members mt-3" formArrayName="members">
+        @for ( memberGroup of membersFormArray.controls; track $index; let i=
+        $index) {
+        <div
+          [formGroupName]="i"
+          class="flex align-items-center justify-content-between gap-2 p-1"
+        >
+          <div class="flex align-items-center gap-3">
+            <p-checkbox formControlName="selected"
+  binary="true"
+  />
+            <span>{{ memberGroup.get("name")?.value }}</span>
+          </div>
+          <div class="flex align-items-center gap-2">
+            @if (newExpense.get('splitType')?.value === 'equal') {
+            <span class="font-medium">
+              {{
+                memberGroup.get("selected")?.value
+                  ? (memberGroup.get("amount")?.value
+                    | currency : "INR" : "symbol" : "1.2-2")
+                  : "0"
+              }}
+            </span>
+            }@else {
+            <p-inputNumber
+              formControlName="amount"
+              mode="currency"
+              currency="INR"
+              placeholder="Amount"
+              styleClass="w-8rem"
+              size="small"
+              variant="filled"
+              [disabled]="!memberGroup.get('selected')?.value"
+            />
+            }
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+    <div class="flex justify-end gap-2 mt-4">
+      <button
+        pButton
+        type="button"
+        label="Cancel"
+        class="p-button-text"
+        (click)="onClose()"
+      ></button>
+      <button
+        pButton
+        type="submit"
+        label="Add Expense"
+        class="p-button-primary"
+      ></button>
+      @if (newExpense.invalid && newExpense.touched) {
+      <div class="text-red-500 text-sm mt-2">
+        Please fill in all required fields.
+      </div>
+      }
+    </div>
+  </form>
+  }
+</p-dialog>

@@ -2,12 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs';
+import { DecodedToken, User } from '../Service/data.model';
+import { jwtDecode } from 'jwt-decode';
 
-interface User  {
-  name: string
-  email: string,
-  password: string,
-}
 @Injectable({
   providedIn: 'root'
 })
@@ -19,10 +16,28 @@ export class AuthService {
 
   constructor(private http: HttpClient, private router: Router) { }
 
+  initializeUserFromToken() {
+  const token = this.getToken();
+  if (token) {
+    try {
+      const decoded = jwtDecode<DecodedToken>(token);
+      const user: User = {
+        id: decoded.id,
+        email: decoded.email,
+        name: decoded.name
+      };
+      this.userSignal.set(user);
+    } catch (error) {
+      console.error('Failed to decode token', error);
+      this.logout();
+    }
+  }
+}
+
   login(email:string, password:string){
     return this.http.post(`${this.api}/login`, { email, password }).pipe(
       tap( (res : any) =>{
-        localStorage.setItem('token',res.accessToken);
+        localStorage.setItem('token',res.token);
         this.userSignal.set(res.user)
       })
     )
@@ -38,6 +53,10 @@ export class AuthService {
 
   getToken() {
     return localStorage.getItem('token');
+  }
+  getUserId(): number {
+    const user = this.userSignal();
+    return user ? user.id : 0;
   }
 
   isLoggedIn() {

@@ -1,27 +1,27 @@
 <!-- Header -->
   <div class="p-d-flex p-ai-center p-jc-between p-mb-3 row">
     <h2 class="p-text-2xl p-font-bold p-text-900">Expenses</h2>
-    <button pButton type="button" label="Add Expense" icon="pi pi-plus" class="p-button-primary p-px-4 p-py-2 p-button-rounded" style="font-weight: 400;"></button>
+    <button pButton type="button" label="Add Expense" icon="pi pi-plus" class="p-button-primary p-px-4 p-py-2 p-button-rounded" style="font-weight: 400;" (click)="openDialog()"></button>
   </div>
   <!-- Expenses List -->
   <div class="p-bg-white p-border-round-xl p-shadow-1">
-    @for (expense of expenses.slice().reverse(); track expense.id; let last = $last) {
+    @for (expense of expenses; track $index; let last = $last) {
       <div class="p-d-flex p-ai-center p-jc-between p-py-4 p-px-5  row" [ngStyle]="{'border-bottom': !last ? '1px solid #f3f4f6' : 'none'}">
         <div class="p-d-flex p-ai-center" style="gap: 1rem;">
           <div>
             <div class="p-text-900 p-font-medium" style="font-size: 1.08rem;">{{ expense.description }}</div>
             <div class="p-d-flex p-ai-center p-text-600 p-text-sm" style="gap: 0.5rem;">
-              <span>{{ expense.group }}</span>
+              <span>{{ expense.selectedGroup }}</span>
               <span>•</span>
               <span>{{ expense.category }}</span>
               <span>•</span>
-              <span>Paid by {{ expense.paidBy }}</span>
+              <span>Paid By {{ getName(expense.paidBy) }}</span>
             </div>
           </div>
         </div>
-        <div class="p-text-right" style="min-width: 90px;">
-          <div class="p-font-semibold" [ngClass]="expense.type === 'paid' ? 'p-text-green-600' : 'p-text-red-600'" style="font-size: 1.1rem;">
-            {{ expense.type === 'paid' ? '+' : '-' }}${{ expense.amount }}
+        <div class="text-right" style="min-width: 90px;">
+          <div class="p-font-semibold" [ngClass]="getName(expense.paidBy) === 'You' ? 'text-green-600' : 'text-red-600'" style="font-size: 1.1rem;">
+            ₹{{ expense.amount }}
           </div>
           <div class="p-text-500 p-text-sm">{{ expense.date }}</div>
         </div>
@@ -31,3 +31,9 @@
       <div class="p-text-center p-p-4 p-text-500">No expenses found.</div>
     }
   </div>
+  <app-add-expense-dialog
+    [visible]="showDialog"
+    [groups]="groups"
+    (close)="showDialog= false"
+    (expenseAdded)="onExpenseAdded($event)"
+    />

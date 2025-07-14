@@ -1,33 +1,96 @@
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
-import { InputTextModule } from 'primeng/inputtext';
-import { CalendarModule } from 'primeng/calendar';
+import {  FormGroup } from '@angular/forms';
+import { ApiService} from '../../Service/api.service';
+import { AddExpenseDialogComponent } from "./add-expense-dialog/add-expense-dialog.component";
+import { Category, Expense, Group, User } from '../../Service/data.model';
+import { AuthService } from '../../auth/auth.service';
 
-interface Expense {
-  id: number;
-  description: string;
-  amount: number;
-  date: string;
-  category: string;
-  paidBy: string;
-  group: string;
-  type: 'paid' | 'owe';
+interface NameUser extends User {
+  name: string
 }
 
 @Component({
   selector: 'app-expenses',
-  imports: [CommonModule,CardModule, ButtonModule, InputTextModule, CalendarModule],
+  imports: [CommonModule, CardModule, ButtonModule, AddExpenseDialogComponent],
   templateUrl: './expenses.component.html',
-  styleUrl: './expenses.component.css'
+  styleUrl: './expenses.component.css',
+  providers:[DatePipe]
 })
-export class ExpensesComponent {
-expenses:Expense[] = 
-[
-    { id: 1, description: 'Dinner at Restaurant', amount: 125, date: '2025-06-30', category: 'Food', paidBy: 'You', group: 'Weekend Trip', type: 'paid' },
-    { id: 2, description: 'Uber Ride', amount: 45, date: '2025-06-29', category: 'Transport', paidBy: 'John', group: 'Weekend Trip', type: 'owe' },
-    { id: 3, description: 'Grocery Shopping', amount: 89, date: '2025-06-28', category: 'Food', paidBy: 'Sarah', group: 'Roommate Bills', type: 'owe' },
-    { id: 4, description: 'Movie Tickets', amount: 36, date: '2025-06-27', category: 'Entertainment', paidBy: 'You', group: 'Weekend Trip', type: 'paid' },
-  ];
+export class ExpensesComponent implements OnInit {
+  newExpense!:FormGroup;
+  showDialog = false;
+  expenses:Expense[]=[];
+  categories!:Category[];
+  groups!: Group[];
+  users!:NameUser[];
+  groupMembers!: User[];
+  userId!:number;
+  
+  constructor(private apiService: ApiService, private auth: AuthService){}
+
+  ngOnInit(): void {
+    this.userId = this.auth.getUserId();
+    this.apiService.getAllExpenses().subscribe({
+    next: (data) => {
+      this.expenses = data.filter(exp =>
+          exp.splitDetails.some(split => split.id === this.userId)
+        )
+        .reverse();
+    },
+    error: (err) => {
+      console.error('Failed to load expenses:', err);
+    }
+  });
+  this.apiService.getCategories().subscribe({
+    next: (data) => {
+      this.categories = data;
+    },
+    error: (err) => {
+      console.error('Failed to load expenses:', err);
+    }
+  });
+  this.apiService.getAllGroups().subscribe({
+    next: (data) => {
+      this.groups = data;
+      
+      if (this.groups.length > 0) {
+        this.groupMembers = this.groups[0].members;
+      }
+    }
+    , error: (err) => {
+      console.error('Failed to load groups:', err);
+    }
+  });
+  this.apiService.getAllUsers().subscribe({
+    next: (data) => { 
+      this.users = data;
+    },
+    error: (err) => {
+      console.error('Failed to load users:', err);
+    }
+  });
+    
+  }
+
+  getName(id:number){
+    if (this.userId === id) {
+      return "You"
+    } else {
+      const user = this.users.find(u => u.id === id);
+      return user ? user.name : '';
+    } 
+  }
+
+  
+  openDialog(){
+    this.showDialog = true;
+  }
+
+  onExpenseAdded(newExpense: Expense) {
+  this.expenses = [newExpense,...this.expenses]; // Add new expense to array
+ }
+  
 }
