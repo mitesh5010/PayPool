@@ -21,7 +21,8 @@ export class RegisterComponent implements OnInit {
       name: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(4)]],
-      confirmPassword: ['',[Validators.required]]
+      confirmPassword: ['',[Validators.required]],
+      pin: ['',[Validators.required]]
     },{validators: this.passwordMatchValidator})
   }
   passwordMatchValidator(form: FormGroup) {
