@@ -6,11 +6,12 @@ import { catchError, finalize, forkJoin, map, Observable } from 'rxjs';
 import { DisplaySettlement, Expense, Group, Settlement, User } from '../../Service/data.model';
 import { ApiService } from '../../Service/api.service';
 import { SettlementService } from '../../Service/settlement.service';
+import { DialogModule } from 'primeng/dialog';
 
 
 @Component({
   selector: 'app-settlements',
-  imports: [ButtonModule, CommonModule],
+  imports: [ButtonModule, CommonModule, DialogModule],
   templateUrl: './settlements.component.html',
   styleUrl: './settlements.component.css',
   encapsulation: ViewEncapsulation.Emulated
@@ -21,6 +22,9 @@ export class SettlementsComponent implements OnInit {
   loading = false;
   error: string | null = null;
   userId !:number; 
+  showHistroyDialog = false;
+  historySettlements: Settlement[] = [];
+
   constructor(
     private auth: AuthService,
     private apiService: ApiService,
@@ -30,6 +34,7 @@ export class SettlementsComponent implements OnInit {
   ngOnInit(): void {
     this.userId = this.auth.getUserId();
     this.loadSettlements();
+    this.loadHistory();
   }
 
   private loadSettlements(): void {
@@ -66,6 +71,19 @@ export class SettlementsComponent implements OnInit {
     );
   }
 
+  loadHistory(): void {
+  this.apiService.getAllSettlements().subscribe({
+    next: (all) => {
+      this.historySettlements = all.filter(
+        s => s.status === 'settled' && (s.fromId === this.userId || s.toId === this.userId)
+      );
+    },
+    error: (err) => {
+      console.error('Failed to load history:', err);
+    }
+  });
+}
+
   private filterUserGroups(allGroups: Group[], userId: number): Group[] {
     return allGroups.filter(group =>
       group.userId === userId || group.members.some(member => member.id === userId)
@@ -91,4 +109,5 @@ export class SettlementsComponent implements OnInit {
   retry(): void {
     this.loadSettlements();
   }
+  
 }
