@@ -111,6 +111,9 @@
                             split.amount | currency : "INR" : "symbol" : "1.2-2"
                           }}
                         </div>
+                        @if (split.id === expense.paidBy) {
+            <span class="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">Payer</span>
+          }
                       </div>
                     </div>
                   </div>
