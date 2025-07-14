@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Category, Expense, Group, User } from './data.model';
+import { Category, Expense, Group, Settlement, User } from './data.model';
 
 @Injectable({
   providedIn: 'root'
@@ -36,5 +36,12 @@ export class ApiService {
   }
   getGroupMembers(groupId: number): Observable<User[]> {
     return this.http.get<User[]>(`${this.apiUrl}/groups/${groupId}/members`);
+  }
+
+  getAllSettlements(): Observable<Settlement[]>{
+    return this.http.get<Settlement[]>(`${this.apiUrl}/settlements`);
+  }
+  postSettlements(settlement: Settlement): Observable<Settlement> {
+    return this.http.post<Settlement>(`${this.apiUrl}/settlements`, settlement);
   }
 }

@@ -1,43 +1,94 @@
 import { CommonModule } from '@angular/common';
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
+import { AuthService } from '../../auth/auth.service';
+import { catchError, finalize, forkJoin, map, Observable } from 'rxjs';
+import { DisplaySettlement, Expense, Group, Settlement, User } from '../../Service/data.model';
+import { ApiService } from '../../Service/api.service';
+import { SettlementService } from '../../Service/settlement.service';
+
 
 @Component({
   selector: 'app-settlements',
   imports: [ButtonModule, CommonModule],
   templateUrl: './settlements.component.html',
   styleUrl: './settlements.component.css',
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.Emulated
 })
-export class SettlementsComponent {
+export class SettlementsComponent implements OnInit {
 
-   settlements = [
-    {
-      avatar: 'JS',
-      title: 'John Smith owes you',
-      source: 'Weekend Trip',
-      amount: 28.50
-    },
-    {
-      avatar: 'AB',
-      title: 'You owe Alice Brown',
-      source: 'Office Lunch',
-      amount: -15.75
-    },
-    {
-      avatar: 'MJ',
-      title: 'Mike Johnson owes you',
-      source: 'Roommates',
-      amount: 420.00
-    }
-  ];
+  settlements: DisplaySettlement[] = [];
+  loading = false;
+  error: string | null = null;
+  userId !:number; 
+  constructor(
+    private auth: AuthService,
+    private apiService: ApiService,
+    private settlementService: SettlementService
+  ) {}
 
-  // Add your click handlers here
-  onRemind(settlement: any) {
-    console.log('Remind', settlement);
+  ngOnInit(): void {
+    this.userId = this.auth.getUserId();
+    this.loadSettlements();
   }
 
-  onSettle(settlement: any) {
-    console.log('Settle', settlement);
+  private loadSettlements(): void {
+    this.loading = true;
+    this.error = null;
+
+    this.loadData().pipe(
+      finalize(() => this.loading = false)
+    ).subscribe({
+      next: (settlements) => {
+        this.settlements = settlements;
+      },
+      error: (err) => {
+        console.error('Error loading settlements:', err);
+        this.error = 'Failed to load settlements. Please try again.';
+      }
+    });
+  }
+
+  private loadData(): Observable<DisplaySettlement[]> {
+    return forkJoin({
+      users: this.apiService.getAllUsers(),
+      expenses: this.apiService.getAllExpenses(),
+      groups: this.apiService.getAllGroups()
+    }).pipe(
+      map(({ users, expenses, groups }) => {
+        const userGroups = this.filterUserGroups(groups, this.userId);
+        return this.calculateAllSettlements(expenses, userGroups, users);
+      }),
+      catchError((err) => {
+        console.error('API Error:', err);
+        throw new Error('Failed to load data from server');
+      })
+    );
+  }
+
+  private filterUserGroups(allGroups: Group[], userId: number): Group[] {
+    return allGroups.filter(group =>
+      group.userId === userId || group.members.some(member => member.id === userId)
+    );
+  }
+
+  private calculateAllSettlements(expenses: Expense[], groups: Group[], users: User[]): DisplaySettlement[] {
+    return groups.flatMap(group => 
+      this.settlementService.calculateSettlements(expenses, group, users, this.userId)
+    );
+  }
+
+  onRemind(settlement: DisplaySettlement): void {
+    console.log('Remind clicked for settlement:', settlement);
+    // TODO: Implement remind functionality
+  }
+
+  onSettle(settlement: DisplaySettlement): void {
+    console.log('Settle clicked for settlement:', settlement);
+    // TODO: Implement settle functionality
+  }
+
+  retry(): void {
+    this.loadSettlements();
   }
 }

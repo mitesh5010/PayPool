@@ -41,3 +41,17 @@ export interface Group {
   youOwe:number; 
   owedToYou:number;
 }
+
+export interface Settlement {
+  fromId: number;
+  toId: number;
+  amount: number;
+  groupId: number;
+  status: "pending" | "settled";
+  settledAt?: Date;
+}
+export interface DisplaySettlement extends Settlement {
+  avatar: string;
+  title: string;
+  source: string;
+}

@@ -14,11 +14,15 @@
         </div>
     </div>
     <div [class]="'settlement-amount ' + (settlement.amount > 0 ? 'positive' : 'negative')">
-      ${{ settlement.amount | number:'1.2-2' }}
+      {{ settlement.amount | currency : "INR" : "symbol" : "1.2-2" }}
     </div>
     <div class="settlement-actions">
-        <button pButton label="Remind" class="p-button-outlined"></button>
-      <button pButton label="{{ settlement.amount > 0 ? 'Settle Up' : 'Pay Now' }}" class="p-button-primary"></button>
+        <button pButton label="Remind" class="p-button-outlined" (click)="onRemind(settlement)"></button>
+      <button pButton label="{{ settlement.amount > 0 ? 'Settle Up' : 'Pay Now' }}" class="p-button-primary" (click)="onSettle(settlement)"></button>
     </div>
   </div>
+}
+
+@empty {
+  <div class="no-settlements">No settlements to display.</div>
 }
