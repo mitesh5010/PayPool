@@ -57,10 +57,18 @@
             />
         </div>
 
+        <!-- PIN for verification -->
+         <div class="form-group">
+          <label class="form-label" for="PIN">Set Your PIN</label>
+          <input type="number" id="pin" formControlName="pin" class="form-input" placeholder="****"
+           />
+         </div>
+
         <button type="submit" class="submit-btn" [disabled]="registerForm.invalid">
           <span>Register</span>
         </button>
       </form>
+
 
       <div class="register-section">
         <p>

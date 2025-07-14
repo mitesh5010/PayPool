@@ -7,11 +7,12 @@ import { DisplaySettlement, Expense, Group, Settlement, User } from '../../Servi
 import { ApiService } from '../../Service/api.service';
 import { SettlementService } from '../../Service/settlement.service';
 import { DialogModule } from 'primeng/dialog';
+import { PinVerificationDialogComponent } from "../pin-verification-dialog/pin-verification-dialog.component";
 
 
 @Component({
   selector: 'app-settlements',
-  imports: [ButtonModule, CommonModule, DialogModule],
+  imports: [ButtonModule, CommonModule, DialogModule, PinVerificationDialogComponent],
   templateUrl: './settlements.component.html',
   styleUrl: './settlements.component.css',
   encapsulation: ViewEncapsulation.Emulated
@@ -24,6 +25,7 @@ export class SettlementsComponent implements OnInit {
   userId !:number; 
   showHistroyDialog = false;
   historySettlements: Settlement[] = [];
+  verifyDialog = false;
 
   constructor(
     private auth: AuthService,
@@ -102,6 +104,7 @@ export class SettlementsComponent implements OnInit {
   }
 
   onSettle(settlement: DisplaySettlement): void {
+    this.verifyDialog = true;
     console.log('Settle clicked for settlement:', settlement);
     // TODO: Implement settle functionality
   }

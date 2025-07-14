@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { tap } from 'rxjs';
+import { map, tap } from 'rxjs';
 import { DecodedToken, User } from '../Service/data.model';
 import { jwtDecode } from 'jwt-decode';
 
@@ -61,5 +61,13 @@ export class AuthService {
 
   isLoggedIn() {
     return !!this.getToken();
+  }
+
+  verifyPin(userId: number, pin: number){
+    return this.http.get<any>(`${this.api}/users/${userId}`).pipe(
+      map(user => {
+        return user && user.pin === pin;
+      })
+    );
   }
 }
