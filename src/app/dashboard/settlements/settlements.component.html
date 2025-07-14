@@ -1,7 +1,7 @@
 
   <div class="p-d-flex ai-center p-jc-between p-mb-3 row">
     <h2 class="p-text-2xl font-bold">Settlement</h2>
-    <button pButton label="Settlement History" class="p-button-outlined"></button>
+    <button pButton label="Settlement History" class="p-button-outlined" (click)="showHistroyDialog= true"></button>
   </div>
 
   @for (settlement of settlements; track $index) {
@@ -17,8 +17,8 @@
       {{ settlement.amount | currency : "INR" : "symbol" : "1.2-2" }}
     </div>
     <div class="settlement-actions">
-        <button pButton label="Remind" class="p-button-outlined" (click)="onRemind(settlement)"></button>
-      <button pButton label="{{ settlement.amount > 0 ? 'Settle Up' : 'Pay Now' }}" class="p-button-primary" (click)="onSettle(settlement)"></button>
+        <!-- <button pButton label="Remind" class="p-button-outlined" (click)="onRemind(settlement)"></button> -->
+      <button pButton label="{{ settlement.amount < 0 ? 'Settle Up' : 'Remind' }}" [ngClass]=" settlement.amount > 0 ? 'p-button-outlined':'p-button-info'" (click)="onSettle(settlement)"></button>
     </div>
   </div>
 }
@@ -26,3 +26,28 @@
 @empty {
   <div class="no-settlements">No settlements to display.</div>
 }
+
+<p-dialog
+  header="Settlement History"
+  [(visible)]="showHistroyDialog"
+  [modal]="true"
+  [style]="{ width: '500px' }"
+  [closable]="true"
+  [draggable]="false"
+  [dismissableMask]="true"
+>
+  <ng-container *ngIf="historySettlements.length; else noHistory">
+    <div *ngFor="let s of historySettlements" class="history-item p-mb-3">
+      <div class="font-semibold">
+        {{ s.fromId === userId ? 'You paid' : 'You received' }} ₹{{ s.amount }}
+      </div>
+      <div class="text-secondary text-sm">
+         Group #{{ s.groupId }}
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-template #noHistory>
+    <p class="text-center">No settlement history available.</p>
+  </ng-template>
+</p-dialog>
