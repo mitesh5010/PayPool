@@ -33,12 +33,14 @@ import { LoadingService } from '../../Service/loading.service';
   providers: [MessageService],
 })
 export class SettlementsComponent implements OnInit {
-  settlements: DisplaySettlement[] = [];
   error: string | null = null;
   userId!: number;
   showHistroyDialog = false;
   historySettlements: Settlement[] = [];
   verifyDialog = false; 
+  currentSettlement: DisplaySettlement | null = null;
+  allSettlements: Settlement[] = [];
+  settlements!:DisplaySettlement[];
 
   constructor(
     private auth: AuthService,
@@ -50,41 +52,46 @@ export class SettlementsComponent implements OnInit {
 
   ngOnInit(): void {
     this.userId = this.auth.getUserId();
-    this.loadSettlements();
+    this.loadData();
     this.loadHistory();
   }
 
-  private loadSettlements(): void {
+  private loadData():void {
     this.loading.show();
-    this.error = null;
-
-    this.loadData()
-      .pipe(finalize(() => (this.loading.hide())))
-      .subscribe({
-        next: (settlements) => {
-          this.settlements = settlements;
-        },
-        error: (err) => {
-          console.error('Error loading settlements:', err);
-          this.error = 'Failed to load settlements. Please try again.';
-        },
-      });
-  }
-
-  private loadData(): Observable<DisplaySettlement[]> {
-    return forkJoin({
+     forkJoin({
       users: this.apiService.getAllUsers(),
       expenses: this.apiService.getAllExpenses(),
       groups: this.apiService.getAllGroups(),
+      settlements: this.apiService.getAllSettlements()
     }).pipe(
-      map(({ users, expenses, groups }) => {
+      finalize(() => this.loading.hide())
+    ).subscribe({
+      next: ({ users, expenses, groups, settlements }) => {
+        this.allSettlements = settlements;
         const userGroups = this.filterUserGroups(groups, this.userId);
-        return this.calculateAllSettlements(expenses, userGroups, users);
-      }),
-      catchError((err) => {
-        console.error('API Error:', err);
-        throw new Error('Failed to load data from server');
-      })
+        this.settlements = this.calculateDisplaySettlements(expenses, userGroups, users, settlements);
+        this.loadHistory();
+      },
+      error: (err) => {
+        console.error('Error loading data:', err);
+        this.error = 'Failed to load data. Please try again.';
+      }
+    });
+  }
+   private calculateDisplaySettlements(
+    expenses: Expense[],
+    groups: Group[],
+    users: User[],
+    existingSettlements: Settlement[]
+  ): DisplaySettlement[] {
+    return groups.flatMap(group => 
+      this.settlementService.calculateSettlements(
+        expenses,
+        group,
+        users,
+        this.userId,
+        existingSettlements.filter(s => s.groupId === group.id)
+      )
     );
   }
 
@@ -114,21 +121,6 @@ export class SettlementsComponent implements OnInit {
     );
   }
 
-  private calculateAllSettlements(
-    expenses: Expense[],
-    groups: Group[],
-    users: User[]
-  ): DisplaySettlement[] {
-    return groups.flatMap((group) =>
-      this.settlementService.calculateSettlements(
-        expenses,
-        group,
-        users,
-        this.userId
-      )
-    );
-  }
-
   onRemind(settlement: DisplaySettlement): void {
     console.log('Remind clicked for settlement:', settlement);
     // TODO: Implement remind functionality
@@ -147,12 +139,59 @@ export class SettlementsComponent implements OnInit {
   }
 
   handleSettleUp(settlement: DisplaySettlement) {
+    this.currentSettlement = settlement;
     this.verifyDialog = false;
     setTimeout(() => {
     this.verifyDialog = true; // Reopen dialog
   }, 0);
     console.log(`Settling up for amount: ${settlement.amount}`);
     // Your settle-up logic
+  }
+  handlePinVerificationSuccess(isValid: boolean) {
+    if (isValid && this.currentSettlement) {
+      this.processSettlement(this.currentSettlement);
+    } else {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Invalid PIN. Please try again.',
+      });
+    }
+    this.currentSettlement = null;
+  }
+  private processSettlement(settlement: DisplaySettlement) {
+    this.loading.show();
+    
+    const newSettlement: Settlement = {
+      fromId: this.userId,
+      toId: settlement.toId,
+      amount: Math.abs(settlement.amount),
+      groupId: settlement.groupId,
+      status: 'settled',
+      settledAt: new Date()
+    };
+
+    this.apiService.postSettlements(newSettlement).subscribe({
+      next: (createdSettlement) => {
+        this.allSettlements = [...this.allSettlements, createdSettlement];
+        this.refreshSettlements();
+        this.verifyDialog = false;
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Settlement completed successfully!',
+        });
+      },
+      error: (err) => {
+        console.error('Settlement error:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to complete settlement. Please try again.',
+        });
+      },
+      complete: () => this.loading.hide()
+    });
   }
   showReminder() {
     this.messageService.add({
@@ -161,8 +200,19 @@ export class SettlementsComponent implements OnInit {
       detail: `Reminder is sended!`,
     });
   }
-
-  retry(): void {
-    this.loadSettlements();
+  private refreshSettlements() {
+    forkJoin({
+      users: this.apiService.getAllUsers(),
+      expenses: this.apiService.getAllExpenses(),
+      groups: this.apiService.getAllGroups()
+    }).subscribe({
+      next: ({ users, expenses, groups }) => {
+        const userGroups = this.filterUserGroups(groups, this.userId);
+        this.settlements = this.calculateDisplaySettlements(expenses, userGroups, users, this.allSettlements);
+      },
+      error: (err) => {
+        console.error('Error refreshing settlements:', err);
+      }
+    });
   }
 }

@@ -10,15 +10,15 @@ export class SettlementService {
 
   constructor() { }
 
-  calculateSettlements(expenses: Expense[], group: Group, users: User[], currentUserId: number): DisplaySettlement[] {
+  calculateSettlements(expenses: Expense[], group: Group, users: User[], currentUserId: number, existingSettlements: Settlement[] = []): DisplaySettlement[] {
     if (!expenses.length || !users.length) return [];
 
-    const balances = this.calculateBalances(expenses, group);
+    const balances = this.calculateBalances(expenses, group,existingSettlements);
     const settlements = this.createSettlements(balances, group.id ?? 0);
     return this.transformSettlements(settlements, users, currentUserId, group.name);
   }
 
-  private calculateBalances(expenses: Expense[], group: Group): Map<number, number> {
+  private calculateBalances(expenses: Expense[], group: Group, existingSettlements: Settlement[]): Map<number, number> {
      const balances = new Map<number, number>();
 
     // Filter expenses for the group and calculate balances
@@ -33,6 +33,14 @@ export class SettlementService {
         balances.set(split.id, (balances.get(split.id) || 0) - split.amount);
       });
     });
+    // Adjust for existing settlements
+    existingSettlements
+      .filter(s => s.groupId === group.id && s.status === 'settled')
+      .forEach(settlement => {
+        balances.set(settlement.fromId, (balances.get(settlement.fromId) || 0) + settlement.amount);
+        balances.set(settlement.toId, (balances.get(settlement.toId) || 0) - settlement.amount);
+      });
+
 
     return balances;
   }

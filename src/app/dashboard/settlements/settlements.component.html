@@ -55,4 +55,7 @@
   </ng-template>
 </p-dialog>
 
-<app-pin-verification-dialog [visible]="verifyDialog" />
+<app-pin-verification-dialog
+ [visible]="verifyDialog"
+ (verified)="handlePinVerificationSuccess($event)"
+ (close)="currentSettlement=null; verifyDialog=false" />
