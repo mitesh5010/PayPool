@@ -158,9 +158,7 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
   private initializeMembersArray(): void {
      this.membersFormArray.clear();
 
-    this.groupMembers.forEach(member => {
-      console.log(member);
-      
+    this.groupMembers.forEach(member => { 
       const memberGroup = this.fb.group({
         selected: [true],
         id: [member.id],
