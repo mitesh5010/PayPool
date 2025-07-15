@@ -6,7 +6,11 @@ import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { ButtonModule } from 'primeng/button';
 import { AvatarModule } from 'primeng/avatar';
 import { CommonModule } from '@angular/common';
-import { User } from '../Service/data.model';
+import {  User } from '../Service/data.model';
+import { DashboardService } from '../Service/dashboard.service';
+
+
+
 
 @Component({
   selector: 'app-dashboard',
@@ -21,9 +25,11 @@ import { User } from '../Service/data.model';
 })
 export class DashboardComponent implements OnInit {
   user!:User;
-  constructor(private auth: AuthService){
+
+  constructor(private auth: AuthService, private dashboardService: DashboardService){
   }
   ngOnInit(): void {
+    
     const user = this.auth.userSignal();
   if (user) {
     this.user = user;
@@ -32,6 +38,8 @@ export class DashboardComponent implements OnInit {
     this.auth.logout(); // optionally redirect if not logged in
   } 
   }
+  
+  
   logout(){
     this.auth.logout();
   }

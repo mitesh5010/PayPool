@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { Category, Expense, Group, Settlement, User } from './data.model';
 
 @Injectable({
@@ -22,6 +22,9 @@ export class ApiService {
   getAllExpenses() {
   return this.http.get<Expense[]>(`${this.apiUrl}/expenses`);
 }
+getUserExpenses(userId: number): Observable<Expense[]> {
+  return this.http.get<Expense[]>(`${this.apiUrl}/expenses?paidBy=${userId}`);
+}
 
   addExpense(expense: any): Observable<any> {
   return this.http.post(`${this.apiUrl}/expenses`, expense);
@@ -42,6 +45,15 @@ export class ApiService {
       group.userId === userId || group.members.some(member => member.id === userId)
     );
   }
+  // Get active groups for a user
+getActiveGroups(userId: number): Observable<Group[]> {
+  return this.getAllGroups().pipe(
+    map(groups => groups.filter(group => 
+      group.status === 'ACTIVE' && 
+      (group.userId === userId || group.members.some(member => member.id === userId))
+    )
+  ));
+}
   getAllSettlements(): Observable<Settlement[]>{
     return this.http.get<Settlement[]>(`${this.apiUrl}/settlements`);
   }
