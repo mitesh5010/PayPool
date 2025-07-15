@@ -84,12 +84,15 @@ export class GroupsComponent implements OnInit {
     //     console.error('Failed to load users:', err);
     //   },
     // });
+    this.loadData()
+    
+  }
+  loadData(){
     this.newGroup = this.fb.group({
       name: ['', Validators.required],
       description: [''],
       members: [[], Validators.required],
     });
-
     forkJoin({
       users: this.apiService.getAllUsers(),
       allExpenses: this.apiService.getAllExpenses(),
@@ -101,7 +104,7 @@ export class GroupsComponent implements OnInit {
 
         const allGroups = groups.slice().reverse();
 
-        this.groups = this.filterUserGroups(allGroups, this.userId).map(group => {
+        this.groups = this.apiService.filterUserGroups(allGroups, this.userId).map(group => {
         const stats = this.splitCal.calculateGroupStats(allExpenses, group, this.userId);
         return { ...group, ...stats };
       });
@@ -109,15 +112,7 @@ export class GroupsComponent implements OnInit {
       error: err => console.error('Failed to load data:', err)
     })
   }
-  filterUserGroups(allGroups: Group[], userId: number): Group[] {
-  return allGroups.filter(group =>
-    group.userId === userId || group.members.some(member => member.id === userId)
-  );
-}
   
-  viewGroup(id: number) {
-    // Navigate to group details
-  }
   openExpenseDialog(groupId: number) {
     this.selectedGroupId = groupId;
     this.showExDialog = true;
@@ -125,10 +120,6 @@ export class GroupsComponent implements OnInit {
   openViewGroupDialog(groupId: number) {
     this.selectedGroupId = groupId;
     this.showViewGroupDialog = true;
-  }
-
-  addExpense(id: number) {
-    // Open add expense dialog/modal
   }
 
   submitGroup() {
@@ -154,6 +145,7 @@ export class GroupsComponent implements OnInit {
           this.groups = [...this.groups, data];
           this.showGroupDialog = false;
           this.newGroup.reset();
+          this.loadData()
         },
         error: (err) => {
           console.error('Failed to add group:', err);

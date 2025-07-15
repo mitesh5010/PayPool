@@ -33,6 +33,10 @@ export class ExpensesComponent implements OnInit {
 
   ngOnInit(): void {
     this.userId = this.auth.getUserId();
+    this.loadData();
+    
+  }
+  loadData(){
     this.apiService.getAllExpenses().subscribe({
     next: (data) => {
       this.expenses = data.filter(exp =>
@@ -72,7 +76,6 @@ export class ExpensesComponent implements OnInit {
       console.error('Failed to load users:', err);
     }
   });
-    
   }
 
   getName(id:number){
@@ -90,7 +93,8 @@ export class ExpensesComponent implements OnInit {
   }
 
   onExpenseAdded(newExpense: Expense) {
-  this.expenses = [newExpense,...this.expenses]; // Add new expense to array
+  this.expenses = [newExpense,...this.expenses];
+  this.loadData(); // Add new expense to array
  }
   
 }
