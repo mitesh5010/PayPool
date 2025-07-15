@@ -99,15 +99,16 @@ export class GroupsComponent implements OnInit {
       users: this.apiService.getAllUsers(),
       allExpenses: this.apiService.getAllExpenses(),
       groups: this.apiService.getAllGroups(),
+      settlements: this.apiService.getAllSettlements() 
     }).subscribe({
-      next: ({users, allExpenses, groups})=>{
+      next: ({users, allExpenses, groups, settlements})=>{
         this.allMembers = users;
         this.allExpenses = allExpenses;
 
         const allGroups = groups.slice().reverse();
 
         this.groups = this.apiService.filterUserGroups(allGroups, this.userId).map(group => {
-        const stats = this.splitCal.calculateGroupStats(allExpenses, group, this.userId);
+        const stats = this.splitCal.calculateGroupStats(allExpenses, group, this.userId,settlements.filter(s => s.groupId === group.id));
         this.loading.hide();
         return { ...group, ...stats };
       });
