@@ -17,6 +17,7 @@ import { PinVerificationDialogComponent } from '../pin-verification-dialog/pin-v
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { LoadingService } from '../../Service/loading.service';
+import { TagModule } from 'primeng/tag';
 
 @Component({
   selector: 'app-settlements',
@@ -26,6 +27,7 @@ import { LoadingService } from '../../Service/loading.service';
     DialogModule,
     PinVerificationDialogComponent,
     ToastModule,
+    TagModule
   ],
   templateUrl: './settlements.component.html',
   styleUrl: './settlements.component.css',
@@ -41,6 +43,8 @@ export class SettlementsComponent implements OnInit {
   currentSettlement: DisplaySettlement | null = null;
   allSettlements: Settlement[] = [];
   settlements!:DisplaySettlement[];
+  users!:User[];
+  groups!: Group[];
 
   constructor(
     private auth: AuthService,
@@ -67,6 +71,8 @@ export class SettlementsComponent implements OnInit {
       finalize(() => this.loading.hide())
     ).subscribe({
       next: ({ users, expenses, groups, settlements }) => {
+        this.users = users;
+        this.groups = groups;
         this.allSettlements = settlements;
         const userGroups = this.filterUserGroups(groups, this.userId);
         this.settlements = this.calculateDisplaySettlements(expenses, userGroups, users, settlements);
@@ -103,7 +109,7 @@ export class SettlementsComponent implements OnInit {
           (s) =>
             s.status === 'settled' &&
             (s.fromId === this.userId || s.toId === this.userId)
-        );
+        ).slice().reverse();
         this.loading.hide();
       },
       error: (err) => {
@@ -213,6 +219,31 @@ export class SettlementsComponent implements OnInit {
       error: (err) => {
         console.error('Error refreshing settlements:', err);
       }
+    });
+  }
+
+  //settlements Histroy
+  getUserName(userId: number): string {
+    const user = this.users.find(u => u.id === userId);
+    return user ? user.name : 'Unknown User';
+  }
+
+  getUserEmail(userId: number): string {
+    const user = this.users.find(u => u.id === userId);
+    return user ? user.email : 'unknown@example.com';
+  }
+  getGroupName(groupId: number): string {
+    const group = this.groups.find(g => g.id === groupId);
+    return group ? group.name : 'Unknown Group';
+  }
+
+  formatDate(date: Date | string | undefined): string {
+    if (!date) return 'N/A';
+    const d = new Date(date);
+    return d.toLocaleDateString('en-IN', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
     });
   }
 }
