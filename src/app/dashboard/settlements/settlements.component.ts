@@ -181,6 +181,7 @@ export class SettlementsComponent implements OnInit {
       next: (createdSettlement) => {
         this.allSettlements = [...this.allSettlements, createdSettlement];
         this.refreshSettlements();
+        this.loadHistory();
         this.verifyDialog = false;
         this.messageService.add({
           severity: 'success',
