@@ -121,6 +121,12 @@ export class GroupsComponent implements OnInit {
     this.selectedGroupId = groupId;
     this.showExDialog = true;
   }
+  handleExpenseDialogClose(refresh: boolean) {
+  this.showExDialog = false;
+  if (!refresh) {
+    this.loadData();
+  }
+  }
   openViewGroupDialog(groupId: number) {
     this.selectedGroupId = groupId;
     this.showViewGroupDialog = true;

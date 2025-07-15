@@ -61,7 +61,7 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
   readonly visible = input<boolean>(false);
   readonly groups = input<Group[]>([]);
   readonly preSelectedGroupId = input<number | null>(null);
-  readonly close = output<void>();
+  readonly close = output<boolean>();
   readonly expenseAdded = output<Expense>();
 
   // Form & Data
@@ -301,7 +301,7 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
     this.api.addExpense(expense).subscribe({
       next: () => {
         this.expenseAdded.emit(expense);
-        this.resetForm();
+        this.onClose();
       },
       error: error => console.error('Error adding expense:', error),
     });
@@ -309,6 +309,7 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
 
   onClose(): void {
     this.resetForm();
+    this.close.emit(false);
   }
 
   private resetForm(): void {
@@ -330,6 +331,5 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
   this.totalAmount.set(null);
   this.newExpense.markAsPristine();
   this.newExpense.markAsUntouched();
-    this.close.emit();
   }
 }

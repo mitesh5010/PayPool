@@ -7,6 +7,7 @@
   [contentStyle]="{ 'overflow-y': 'auto', 'max-height': 'none' }"
   [draggable]="false"
   [styleClass]="'custom-modal'"
+  (onHide)="onClose()"
 >
   @if (newExpense) {
 
