@@ -17,6 +17,7 @@ import { CurrencyPipe } from '@angular/common';
 import { CardModule } from 'primeng/card';
 import { BadgeModule } from 'primeng/badge';
 import { ApiService } from '../../../Service/api.service';
+import { LoadingService } from '../../../Service/loading.service';
 
 @Component({
   selector: 'app-view-group',
@@ -44,17 +45,19 @@ export class ViewGroupComponent implements OnInit {
 
   tabs: { value: number; title: string }[] = [];
 
-  constructor(private apiService: ApiService) {
+  constructor(private apiService: ApiService,private loading: LoadingService) {
     effect(() => {
       this.viewGroup.set(this.selectedGroup());
     });
   }
 
   ngOnInit(): void {
+    this.loading.show();
     this.apiService.getAllUsers().subscribe({
       next: (data) => (this.users = data),
       error: (err) => console.log('Error on UserData', err),
     });
+    this.loading.hide()
     this.tabs = [
       { value: 1, title: 'Expenses' },
       { value: 2, title: 'Members' },

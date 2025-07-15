@@ -32,6 +32,7 @@ import { ApiService } from '../../../Service/api.service';
 import { Category, Expense, Group, User } from '../../../Service/data.model';
 import { distinctUntilChanged } from 'rxjs';
 import { AuthService } from '../../../auth/auth.service';
+import { LoadingService } from '../../../Service/loading.service';
 
 @Component({
   selector: 'app-add-expense-dialog',
@@ -80,13 +81,15 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
     private fb: FormBuilder,
     private datePipe: DatePipe,
     private api: ApiService,
-    private auth: AuthService
+    private auth: AuthService,
+    private loading: LoadingService
   ) {}
 
   ngOnInit(): void {
+    this.loading.show();
+    this.userId = this.auth.getUserId();
     this.initializeForm();
     this.loadCategories();
-    this.userId = this.auth.getUserId();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -120,6 +123,7 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
   }
 
     this.subscribeToFormChanges();
+    this.loading.hide();
   }
 
   private subscribeToFormChanges(): void {

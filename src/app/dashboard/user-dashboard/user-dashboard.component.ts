@@ -9,6 +9,7 @@ import { AuthService } from '../../auth/auth.service';
 import { DashboardService } from '../../Service/dashboard.service';
 import { forkJoin } from 'rxjs';
 import { CurrencyPipe } from '@angular/common';
+import { LoadingService } from '../../Service/loading.service';
 
 interface DashboardStats {
   totalExpenses: number;
@@ -31,24 +32,22 @@ export class UserDashboardComponent implements OnInit {
     totalOwedToYou: 0,
     activeGroupsCount: 0,
   };
-  loading = true;
   
-  constructor(private auth: AuthService, private dashboardService: DashboardService){}
+  constructor(private auth: AuthService, private dashboardService: DashboardService, private loading: LoadingService){}
     
   ngOnInit(): void {
+    this.loading.show();
     this.userId = this.auth.getUserId();
     this.dashboardService.getConsolidatedStats(this.userId).subscribe({
       next: (stats) => {
         this.stats = stats;
-        this.loading = false;
+        this.loading.hide();
       },
       error: (err) => {
         console.error('Error loading dashboard data', err);
-        this.loading = false;
+        this.loading.hide();
       }
     });
   }
   
- 
-
 }
