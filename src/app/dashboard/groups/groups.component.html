@@ -107,7 +107,7 @@
 <app-add-expense-dialog 
   [visible]="showExDialog"
   [groups]="groups"
-  (close)="showExDialog= false"
+  (close)="handleExpenseDialogClose($event)"
   [preSelectedGroupId]="selectedGroupId"/>
 
   <app-view-group 
