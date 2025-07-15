@@ -37,7 +37,11 @@ export class ApiService {
   getGroupMembers(groupId: number): Observable<User[]> {
     return this.http.get<User[]>(`${this.apiUrl}/groups/${groupId}/members`);
   }
-
+  filterUserGroups(allGroups: Group[], userId: number): Group[] {
+    return allGroups.filter(group =>
+      group.userId === userId || group.members.some(member => member.id === userId)
+    );
+  }
   getAllSettlements(): Observable<Settlement[]>{
     return this.http.get<Settlement[]>(`${this.apiUrl}/settlements`);
   }
