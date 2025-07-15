@@ -24,8 +24,8 @@ import { LoadingService } from '../../Service/loading.service';
     }
 
     .logo-pulse {
-      width: 150px;
-      height: 150px;
+      width: 200px;
+      height: 200px;
       animation: pulse 1.2s infinite ease-in-out;
     }
 
