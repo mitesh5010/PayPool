@@ -7,6 +7,7 @@ import { ApiService} from '../../Service/api.service';
 import { AddExpenseDialogComponent } from "./add-expense-dialog/add-expense-dialog.component";
 import { Category, Expense, Group, User } from '../../Service/data.model';
 import { AuthService } from '../../auth/auth.service';
+import { LoadingService } from '../../Service/loading.service';
 
 interface NameUser extends User {
   name: string
@@ -29,9 +30,10 @@ export class ExpensesComponent implements OnInit {
   groupMembers!: User[];
   userId!:number;
   
-  constructor(private apiService: ApiService, private auth: AuthService){}
+  constructor(private apiService: ApiService, private auth: AuthService, private loading: LoadingService){}
 
   ngOnInit(): void {
+    this.loading.show();
     this.userId = this.auth.getUserId();
     this.loadData();
     
@@ -76,6 +78,7 @@ export class ExpensesComponent implements OnInit {
       console.error('Failed to load users:', err);
     }
   });
+  this.loading.hide();
   }
 
   getName(id:number){

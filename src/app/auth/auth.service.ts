@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { map, tap } from 'rxjs';
+import { catchError, map, tap } from 'rxjs';
 import { DecodedToken, User } from '../Service/data.model';
 import { jwtDecode } from 'jwt-decode';
+import { LoadingService } from '../Service/loading.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,7 @@ export class AuthService {
 
   userSignal = signal<User | null>(null)
 
-  constructor(private http: HttpClient, private router: Router) { }
+  constructor(private http: HttpClient, private router: Router, private loading: LoadingService) { }
 
   initializeUserFromToken() {
   const token = this.getToken();
@@ -35,12 +36,18 @@ export class AuthService {
 }
 
   login(email:string, password:string){
+    this.loading.show();
     return this.http.post(`${this.api}/login`, { email, password }).pipe(
       tap( (res : any) =>{
         localStorage.setItem('token',res.token);
-        this.userSignal.set(res.user)
-      })
-    )
+        this.userSignal.set(res.user);
+        this.loading.hide();
+      }),
+      catchError(err => {
+      this.loading.hide(); 
+      throw err;
+    })
+    );  
   }
   register(user: User){
     return this.http.post(`${this.api}/register`, user);

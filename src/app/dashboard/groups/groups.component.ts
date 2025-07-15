@@ -20,6 +20,7 @@ import { AuthService } from '../../auth/auth.service';
 import { ViewGroupComponent } from "./view-group/view-group.component";
 import { SplitCalculationService } from '../../Service/split-calculation.service';
 import { forkJoin } from 'rxjs';
+import { LoadingService } from '../../Service/loading.service';
 
 @Component({
   selector: 'app-groups',
@@ -52,9 +53,10 @@ export class GroupsComponent implements OnInit {
   userId: number = 0;
   allExpenses!:Expense[];
 
-  constructor(private fb: FormBuilder, private apiService: ApiService, private auth: AuthService, private splitCal: SplitCalculationService) {}
+  constructor(private fb: FormBuilder, private apiService: ApiService, private auth: AuthService, private splitCal: SplitCalculationService, private loading: LoadingService) {}
 
   ngOnInit() {
+    this.loading.show();
     // Replace with real service call
     this.userId = this.auth.getUserId();
     // this.apiService.getAllGroups().subscribe({
@@ -106,6 +108,7 @@ export class GroupsComponent implements OnInit {
 
         this.groups = this.apiService.filterUserGroups(allGroups, this.userId).map(group => {
         const stats = this.splitCal.calculateGroupStats(allExpenses, group, this.userId);
+        this.loading.hide();
         return { ...group, ...stats };
       });
       },

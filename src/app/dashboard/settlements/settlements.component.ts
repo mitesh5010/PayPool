@@ -16,6 +16,7 @@ import { DialogModule } from 'primeng/dialog';
 import { PinVerificationDialogComponent } from '../pin-verification-dialog/pin-verification-dialog.component';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { LoadingService } from '../../Service/loading.service';
 
 @Component({
   selector: 'app-settlements',
@@ -33,7 +34,6 @@ import { ToastModule } from 'primeng/toast';
 })
 export class SettlementsComponent implements OnInit {
   settlements: DisplaySettlement[] = [];
-  loading = false;
   error: string | null = null;
   userId!: number;
   showHistroyDialog = false;
@@ -44,7 +44,8 @@ export class SettlementsComponent implements OnInit {
     private auth: AuthService,
     private apiService: ApiService,
     private settlementService: SettlementService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private loading: LoadingService
   ) {}
 
   ngOnInit(): void {
@@ -54,11 +55,11 @@ export class SettlementsComponent implements OnInit {
   }
 
   private loadSettlements(): void {
-    this.loading = true;
+    this.loading.show();
     this.error = null;
 
     this.loadData()
-      .pipe(finalize(() => (this.loading = false)))
+      .pipe(finalize(() => (this.loading.hide())))
       .subscribe({
         next: (settlements) => {
           this.settlements = settlements;
@@ -88,6 +89,7 @@ export class SettlementsComponent implements OnInit {
   }
 
   loadHistory(): void {
+    this.loading.show();
     this.apiService.getAllSettlements().subscribe({
       next: (all) => {
         this.historySettlements = all.filter(
@@ -95,9 +97,11 @@ export class SettlementsComponent implements OnInit {
             s.status === 'settled' &&
             (s.fromId === this.userId || s.toId === this.userId)
         );
+        this.loading.hide();
       },
       error: (err) => {
         console.error('Failed to load history:', err);
+        this.loading.hide();
       },
     });
   }
