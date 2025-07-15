@@ -61,9 +61,14 @@ export class ViewGroupComponent implements OnInit {
     ];
   }
   filteredExpenses() {
-    return this.allExpenses().filter(
-      (e) => e.selectedGroup === this.viewGroup()?.name
-    );
+    const expenses = this.allExpenses();
+    const groupName = this.viewGroup()?.name;
+  
+    if (!expenses || !groupName) {
+      return []; // Return an empty array if expenses or groupName is undefined
+    }
+  
+    return expenses.filter((e) => e.selectedGroup === groupName);
   }
   getUserName(split: { id: number; email: string }): string {
     const user = this.users?.find(
