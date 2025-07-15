@@ -38,7 +38,7 @@ export class SettlementsComponent implements OnInit {
   userId!: number;
   showHistroyDialog = false;
   historySettlements: Settlement[] = [];
-  verifyDialog = false;
+  verifyDialog = false; 
 
   constructor(
     private auth: AuthService,
@@ -130,7 +130,7 @@ export class SettlementsComponent implements OnInit {
     // TODO: Implement remind functionality
   }
 
-  onSettle(settlement: { amount: number }) {
+  onSettle(settlement: DisplaySettlement) {
     if (settlement.amount < 0) {
       this.handleSettleUp(settlement);
     } else if (settlement.amount > 0) {
@@ -142,8 +142,11 @@ export class SettlementsComponent implements OnInit {
     }
   }
 
-  handleSettleUp(settlement: { amount: number }) {
-    this.verifyDialog = true;
+  handleSettleUp(settlement: DisplaySettlement) {
+    this.verifyDialog = false;
+    setTimeout(() => {
+    this.verifyDialog = true; // Reopen dialog
+  }, 0);
     console.log(`Settling up for amount: ${settlement.amount}`);
     // Your settle-up logic
   }
