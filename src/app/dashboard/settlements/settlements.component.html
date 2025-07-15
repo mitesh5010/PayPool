@@ -66,7 +66,7 @@
             <!-- From User -->
             <div class="flex flex-column align-items-center text-center">
               <div
-                class="w-4rem h-4rem border-circle bg-blue-100 text-blue-800 flex align-items-center justify-content-center mb-2"
+                class="w-4rem h-4rem border-circle bg-red-100 text-red-800 flex align-items-center justify-content-center mb-2"
               >
                 {{ getUserName(settlement.fromId).charAt(0).toUpperCase() }}
               </div>
@@ -80,11 +80,13 @@
 
             <!-- Arrow and Amount -->
             <div class="flex flex-column align-items-center mx-3">
+              ->
               <div
                 class="bg-blue-100 text-blue-800 border-round px-3 py-1 mb-2"
               >
-                <span class="font-bold text-lg">₹{{ settlement.amount }}</span>
+            <span class="font-bold text-lg">₹{{ settlement.amount }}</span>
               </div>
+              ->
               <div class="flex align-items-center gap-1">
                 <div class="w-2rem h-1 bg-primary-400"></div>
                 <i class="pi pi-arrow-right text-primary-600"></i>

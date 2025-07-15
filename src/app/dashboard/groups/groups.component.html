@@ -25,15 +25,15 @@
 
         <div class="grid">
           <div class="col-4 text-center">
-            <div class="text-lg font-bold text-900">&#8377; {{ group.total }}</div>
+            <div class="text-lg font-bold text-900">&#8377; {{ group.total | number:'1.2-2' }}</div>
             <div class="text-sm text-gray-800">Total</div>
           </div>
           <div class="col-4 text-center">
-            <div class="text-lg font-bold text-red-600">&#8377; {{ group.youOwe }}</div>
+            <div class="text-lg font-bold text-red-600">&#8377; {{ group.youOwe | number:'1.2-2' }}</div>
             <div class="text-sm text-gray-800">You Owe</div>
           </div>
           <div class="col-4 text-center">
-            <div class="text-lg font-bold text-green-600">&#8377; {{ group.owedToYou }}</div>
+            <div class="text-lg font-bold text-green-600">&#8377; {{ group.owedToYou | number:'1.2-2' }}</div>
             <div class="text-sm text-gray-800">Owed to You</div>
           </div>
         </div>
