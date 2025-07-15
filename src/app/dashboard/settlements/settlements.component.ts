@@ -3,26 +3,39 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { AuthService } from '../../auth/auth.service';
 import { catchError, finalize, forkJoin, map, Observable } from 'rxjs';
-import { DisplaySettlement, Expense, Group, Settlement, User } from '../../Service/data.model';
+import {
+  DisplaySettlement,
+  Expense,
+  Group,
+  Settlement,
+  User,
+} from '../../Service/data.model';
 import { ApiService } from '../../Service/api.service';
 import { SettlementService } from '../../Service/settlement.service';
 import { DialogModule } from 'primeng/dialog';
-import { PinVerificationDialogComponent } from "../pin-verification-dialog/pin-verification-dialog.component";
-
+import { PinVerificationDialogComponent } from '../pin-verification-dialog/pin-verification-dialog.component';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-settlements',
-  imports: [ButtonModule, CommonModule, DialogModule, PinVerificationDialogComponent],
+  imports: [
+    ButtonModule,
+    CommonModule,
+    DialogModule,
+    PinVerificationDialogComponent,
+    ToastModule,
+  ],
   templateUrl: './settlements.component.html',
   styleUrl: './settlements.component.css',
-  encapsulation: ViewEncapsulation.Emulated
+  encapsulation: ViewEncapsulation.Emulated,
+  providers: [MessageService],
 })
 export class SettlementsComponent implements OnInit {
-
   settlements: DisplaySettlement[] = [];
   loading = false;
   error: string | null = null;
-  userId !:number; 
+  userId!: number;
   showHistroyDialog = false;
   historySettlements: Settlement[] = [];
   verifyDialog = false;
@@ -30,7 +43,8 @@ export class SettlementsComponent implements OnInit {
   constructor(
     private auth: AuthService,
     private apiService: ApiService,
-    private settlementService: SettlementService
+    private settlementService: SettlementService,
+    private messageService: MessageService
   ) {}
 
   ngOnInit(): void {
@@ -43,24 +57,24 @@ export class SettlementsComponent implements OnInit {
     this.loading = true;
     this.error = null;
 
-    this.loadData().pipe(
-      finalize(() => this.loading = false)
-    ).subscribe({
-      next: (settlements) => {
-        this.settlements = settlements;
-      },
-      error: (err) => {
-        console.error('Error loading settlements:', err);
-        this.error = 'Failed to load settlements. Please try again.';
-      }
-    });
+    this.loadData()
+      .pipe(finalize(() => (this.loading = false)))
+      .subscribe({
+        next: (settlements) => {
+          this.settlements = settlements;
+        },
+        error: (err) => {
+          console.error('Error loading settlements:', err);
+          this.error = 'Failed to load settlements. Please try again.';
+        },
+      });
   }
 
   private loadData(): Observable<DisplaySettlement[]> {
     return forkJoin({
       users: this.apiService.getAllUsers(),
       expenses: this.apiService.getAllExpenses(),
-      groups: this.apiService.getAllGroups()
+      groups: this.apiService.getAllGroups(),
     }).pipe(
       map(({ users, expenses, groups }) => {
         const userGroups = this.filterUserGroups(groups, this.userId);
@@ -74,27 +88,40 @@ export class SettlementsComponent implements OnInit {
   }
 
   loadHistory(): void {
-  this.apiService.getAllSettlements().subscribe({
-    next: (all) => {
-      this.historySettlements = all.filter(
-        s => s.status === 'settled' && (s.fromId === this.userId || s.toId === this.userId)
-      );
-    },
-    error: (err) => {
-      console.error('Failed to load history:', err);
-    }
-  });
-}
+    this.apiService.getAllSettlements().subscribe({
+      next: (all) => {
+        this.historySettlements = all.filter(
+          (s) =>
+            s.status === 'settled' &&
+            (s.fromId === this.userId || s.toId === this.userId)
+        );
+      },
+      error: (err) => {
+        console.error('Failed to load history:', err);
+      },
+    });
+  }
 
   private filterUserGroups(allGroups: Group[], userId: number): Group[] {
-    return allGroups.filter(group =>
-      group.userId === userId || group.members.some(member => member.id === userId)
+    return allGroups.filter(
+      (group) =>
+        group.userId === userId ||
+        group.members.some((member) => member.id === userId)
     );
   }
 
-  private calculateAllSettlements(expenses: Expense[], groups: Group[], users: User[]): DisplaySettlement[] {
-    return groups.flatMap(group => 
-      this.settlementService.calculateSettlements(expenses, group, users, this.userId)
+  private calculateAllSettlements(
+    expenses: Expense[],
+    groups: Group[],
+    users: User[]
+  ): DisplaySettlement[] {
+    return groups.flatMap((group) =>
+      this.settlementService.calculateSettlements(
+        expenses,
+        group,
+        users,
+        this.userId
+      )
     );
   }
 
@@ -103,14 +130,32 @@ export class SettlementsComponent implements OnInit {
     // TODO: Implement remind functionality
   }
 
-  onSettle(settlement: DisplaySettlement): void {
+  onSettle(settlement: { amount: number }) {
+    if (settlement.amount < 0) {
+      this.handleSettleUp(settlement);
+    } else if (settlement.amount > 0) {
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Reminder',
+        detail: `You are owed ${settlement.amount}.`,
+      });
+    }
+  }
+
+  handleSettleUp(settlement: { amount: number }) {
     this.verifyDialog = true;
-    console.log('Settle clicked for settlement:', settlement);
-    // TODO: Implement settle functionality
+    console.log(`Settling up for amount: ${settlement.amount}`);
+    // Your settle-up logic
+  }
+  showReminder() {
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Reminder',
+      detail: `Reminder is sended!`,
+    });
   }
 
   retry(): void {
     this.loadSettlements();
   }
-  
 }

@@ -3,6 +3,7 @@
     <h2 class="p-text-2xl font-bold">Settlement</h2>
     <button pButton label="Settlement History" class="p-button-outlined" (click)="showHistroyDialog= true"></button>
   </div>
+  <p-toast></p-toast>
 
   @for (settlement of settlements; track $index) {
     <div class="settlement-item ">
@@ -16,11 +17,13 @@
     <div [class]="'settlement-amount ' + (settlement.amount > 0 ? 'positive' : 'negative')">
       {{ settlement.amount | currency : "INR" : "symbol" : "1.2-2" }}
     </div>
-    <div class="settlement-actions">
-        <!-- <button pButton label="Remind" class="p-button-outlined" (click)="onRemind(settlement)"></button> -->
-      <button pButton label="{{ settlement.amount < 0 ? 'Settle Up' : 'Remind' }}" [ngClass]=" settlement.amount > 0 ? 'p-button-outlined':'p-button-info'" (click)="onSettle(settlement)"></button>
-    </div>
+   <button pButton 
+        label="{{ settlement.amount < 0 ? 'Settle Up' : 'Remind' }}" 
+        [ngClass]="settlement.amount > 0 ? 'p-button-outlined' : 'p-button-info'" 
+        (click)="settlement.amount < 0 ? handleSettleUp(settlement) : showReminder()">
+</button>
   </div>
+  
 }
 
 @empty {
@@ -52,4 +55,4 @@
   </ng-template>
 </p-dialog>
 
-  <app-pin-verification-dialog [visible]="verifyDialog" />
+<app-pin-verification-dialog [visible]="verifyDialog" />
