@@ -21,12 +21,12 @@ export class DashboardService {
       this.apiService.getActiveGroups(userId),
       this.apiService.getAllExpenses(),
       this.apiService.getAllSettlements(),
-      this.apiService.getUserExpenses(userId)
     ]).pipe(
-      map(([groups, expenses, settlements, userExpenses]) => {
+      map(([groups, expenses, settlements]) => {
         let totalYouOwe = 0;
         let totalOwedToYou = 0;
         let groupTotals = 0;
+        let totalExpenses = 0;
 
         // Calculate totals across all groups
         groups.forEach(group => {
@@ -39,9 +39,20 @@ export class DashboardService {
           totalYouOwe += Math.max(0, stats.youOwe - settlementAdjustments.paidSettlements);
           totalOwedToYou += Math.max(0, stats.owedToYou - settlementAdjustments.receivedSettlements);
         });
-
-        // Total expenses is sum of all expenses paid by the user
-        const totalExpenses = userExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+        expenses.forEach(exp => {
+        
+          const userShare = exp.splitDetails.find(s => s.id === userId);
+          if (userShare) {
+            totalExpenses += userShare.amount;
+          }
+          
+        });
+        if (totalOwedToYou) {
+          totalExpenses += totalOwedToYou;
+        }
+        if (totalYouOwe) {
+          totalExpenses -= totalYouOwe;
+        }
 
         return {
           totalExpenses,
