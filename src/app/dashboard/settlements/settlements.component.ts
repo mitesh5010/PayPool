@@ -45,6 +45,9 @@ export class SettlementsComponent implements OnInit {
   settlements!:DisplaySettlement[];
   users!:User[];
   groups!: Group[];
+  expenses!: Expense[];
+
+  showOverall = true;
 
   constructor(
     private auth: AuthService,
@@ -72,10 +75,11 @@ export class SettlementsComponent implements OnInit {
     ).subscribe({
       next: ({ users, expenses, groups, settlements }) => {
         this.users = users;
+        this.expenses = expenses;
         this.groups = groups;
         this.allSettlements = settlements;
-        const userGroups = this.filterUserGroups(groups, this.userId);
-        this.settlements = this.calculateDisplaySettlements(expenses, userGroups, users, settlements);
+        // const userGroups = this.filterUserGroups(groups, this.userId);
+        this.settlements = this.calculateDisplaySettlements(expenses, groups, users, settlements);
         this.loadHistory();
       },
       error: (err) => {
@@ -90,15 +94,14 @@ export class SettlementsComponent implements OnInit {
     users: User[],
     existingSettlements: Settlement[]
   ): DisplaySettlement[] {
-    return groups.flatMap(group => 
-      this.settlementService.calculateSettlements(
+    return this.settlementService.calculateSettlements(
         expenses,
-        group,
+        groups,
         users,
         this.userId,
-        existingSettlements.filter(s => s.groupId === group.id)
+        existingSettlements
       )
-    );
+  
   }
 
   loadHistory(): void {
@@ -207,20 +210,55 @@ export class SettlementsComponent implements OnInit {
       detail: `Reminder is sended!`,
     });
   }
-  private refreshSettlements() {
-    forkJoin({
-      users: this.apiService.getAllUsers(),
-      expenses: this.apiService.getAllExpenses(),
-      groups: this.apiService.getAllGroups()
-    }).subscribe({
-      next: ({ users, expenses, groups }) => {
-        const userGroups = this.filterUserGroups(groups, this.userId);
-        this.settlements = this.calculateDisplaySettlements(expenses, userGroups, users, this.allSettlements);
-      },
-      error: (err) => {
-        console.error('Error refreshing settlements:', err);
-      }
-    });
+  // private refreshSettlements() {
+  //   forkJoin({
+  //     users: this.apiService.getAllUsers(),
+  //     expenses: this.apiService.getAllExpenses(),
+  //     groups: this.apiService.getAllGroups()
+  //   }).subscribe({
+  //     next: ({ users, expenses, groups }) => {
+  //       const userGroups = this.filterUserGroups(groups, this.userId);
+  //       this.settlements = this.calculateDisplaySettlements(expenses, userGroups, users, this.allSettlements);
+  //     },
+  //     error: (err) => {
+  //       console.error('Error refreshing settlements:', err);
+  //     }
+  //   });
+  // }
+
+  showOverallSettlements() {
+  this.showOverall = true;
+  this.refreshSettlements();
+}
+
+showGroupSettlements() {
+  this.showOverall = false;
+  this.refreshSettlements();
+}
+
+private refreshSettlements() {
+    if (!this.users || !this.expenses || !this.groups) return;
+
+    if (this.showOverall) {
+      // Calculate overall settlements
+      this.settlements = this.settlementService.calculateSettlements(
+        this.expenses,
+        this.groups,
+        this.users,
+        this.userId,
+        this.allSettlements
+      );
+    } else {
+      // Calculate group-wise settlements
+      const userGroups = this.filterUserGroups(this.groups, this.userId);
+      this.settlements = this.settlementService.calculateGroupSettlements(
+        this.expenses,
+        userGroups,
+        this.users,
+        this.userId,
+        this.allSettlements
+      );
+    }
   }
 
   //settlements Histroy
