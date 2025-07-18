@@ -10,21 +10,33 @@ export class SettlementService {
 
   constructor() { }
 
-  calculateSettlements(expenses: Expense[], group: Group, users: User[], currentUserId: number, existingSettlements: Settlement[] = []): DisplaySettlement[] {
+  calculateSettlements(expenses: Expense[], groups: Group[], users: User[], currentUserId: number, existingSettlements: Settlement[] = []): DisplaySettlement[] {
     if (!expenses.length || !users.length) return [];
 
-    const balances = this.calculateBalances(expenses, group,existingSettlements);
-    const settlements = this.createSettlements(balances, group.id ?? 0);
-    return this.transformSettlements(settlements, users, currentUserId, group.name);
+    const balances = this.calculateBalances(expenses, existingSettlements);
+    const settlements = this.createSettlements(balances, 0);
+    return this.transformSettlements(settlements, users, currentUserId, 'All');
+  }
+  calculateGroupSettlements(expenses: Expense[], groups: Group[], users: User[], currentUserId: number, existingSettlements: Settlement[] = []): DisplaySettlement[] {
+    if (!expenses.length || !users.length || !groups.length) return [];
+
+    return groups.flatMap(group => {
+      const groupExpenses = expenses.filter(e => e.selectedGroup === group.name);
+      const groupSettlements = existingSettlements.filter(s => s.groupId === group.id);
+      
+      const balances = this.calculateGroupBalances(groupExpenses, groupSettlements);
+      const settlements = this.createSettlements(balances, group.id ?? 0);
+      return this.transformSettlements(settlements, users, currentUserId, group.name);
+    });
   }
 
-  private calculateBalances(expenses: Expense[], group: Group, existingSettlements: Settlement[]): Map<number, number> {
+  private calculateBalances(expenses: Expense[],  existingSettlements: Settlement[]): Map<number, number> {
      const balances = new Map<number, number>();
 
     // Filter expenses for the group and calculate balances
-    const groupExpenses = expenses.filter(expense => expense.selectedGroup === group.name);
+    // const groupExpenses = expenses.filter(expense => expense.selectedGroup === group.name);
 
-    groupExpenses.forEach(expense => {
+    expenses.forEach(expense => {
       // Update payer's balance
       balances.set(expense.paidBy, (balances.get(expense.paidBy) || 0) + expense.amount);
       
@@ -35,12 +47,32 @@ export class SettlementService {
     });
     // Adjust for existing settlements
     existingSettlements
-      .filter(s => s.groupId === group.id && s.status === 'settled')
+      .filter(s => s.status === 'settled')
       .forEach(settlement => {
         balances.set(settlement.fromId, (balances.get(settlement.fromId) || 0) + settlement.amount);
         balances.set(settlement.toId, (balances.get(settlement.toId) || 0) - settlement.amount);
       });
 
+
+    return balances;
+  }
+
+  private calculateGroupBalances(expenses: Expense[], existingSettlements: Settlement[]): Map<number, number> {
+    const balances = new Map<number, number>();
+
+    expenses.forEach(expense => {
+      balances.set(expense.paidBy, (balances.get(expense.paidBy) || 0) + expense.amount);
+      expense.splitDetails.forEach(split => {
+        balances.set(split.id, (balances.get(split.id) || 0) - split.amount);
+      });
+    });
+
+    existingSettlements
+      .filter(s => s.status === 'settled')
+      .forEach(settlement => {
+        balances.set(settlement.fromId, (balances.get(settlement.fromId) || 0) + settlement.amount);
+        balances.set(settlement.toId, (balances.get(settlement.toId) || 0) - settlement.amount);
+      });
 
     return balances;
   }

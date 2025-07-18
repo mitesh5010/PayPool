@@ -1,11 +1,27 @@
-<div class="p-d-flex ai-center p-jc-between p-mb-3 row">
+<div class="p-d-flex ai-center p-jc-between p-mb-3 row ">
   <h2 class="p-text-2xl font-bold">Settlement</h2>
-  <button
-    pButton
-    label="Settlement History"
-    class="p-button-outlined"
-    (click)="showHistroyDialog = true"
-  ></button>
+  <div class="flex gap-2">
+    <button
+      pButton
+      label="Group Settlements"
+      class="p-button-outlined p-mr-2"
+      (click)="showGroupSettlements()"
+      [disabled]="!showOverall"
+    ></button>
+    <button
+      pButton
+      label="Overall Settlements"
+      class="p-button-outlined p-mr-2"
+      (click)="showOverallSettlements()"
+      [disabled]="showOverall"
+    ></button>
+    <button
+      pButton
+      label="Settlement History"
+      class="p-button-outlined"
+      (click)="showHistroyDialog = true"
+    ></button>
+  </div>
 </div>
 <p-toast></p-toast>
 
