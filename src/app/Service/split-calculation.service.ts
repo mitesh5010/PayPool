@@ -16,7 +16,7 @@ export class SplitCalculationService {
     return { total: 0, youOwe: 0, owedToYou: 0 };
   }
 
-    const groupExpenses = expenses.filter(e => e.selectedGroup === group.name);
+    const groupExpenses = expenses.filter(e => e.selectedGroupId === group.id);
     // Filter settlements for this group
     const groupSettlements = settlements.filter(s => s.groupId === group.id);
 
