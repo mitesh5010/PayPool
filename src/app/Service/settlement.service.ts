@@ -21,7 +21,7 @@ export class SettlementService {
     if (!expenses.length || !users.length || !groups.length) return [];
 
     return groups.flatMap(group => {
-      const groupExpenses = expenses.filter(e => e.selectedGroup === group.name);
+      const groupExpenses = expenses.filter(e => e.selectedGroupId === group.id);
       const groupSettlements = existingSettlements.filter(s => s.groupId === group.id);
       
       const balances = this.calculateGroupBalances(groupExpenses, groupSettlements);

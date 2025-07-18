@@ -16,6 +16,7 @@ export interface SplitDetail {
 
 export interface Expense {
   description: string;
+  selectedGroupId: number;
   selectedGroup: string;
   amount: number;
   date: string;

@@ -288,6 +288,7 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
     }
 
     const expense: Expense = {
+      selectedGroupId: groupId,
       selectedGroup: this.groups().find(g => g.id === groupId)?.name ?? '',
       description: formValue.description,
       amount: formValue.amount,
