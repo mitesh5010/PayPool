@@ -1,17 +1,17 @@
-<div class="p-d-flex ai-center p-jc-between p-mb-3 row ">
-  <h2 class="p-text-2xl font-bold">Settlement</h2>
+<div class="flex align-items-center justify-content-between mb-3">
+  <h2 class="text-2xl font-bold">Settlements</h2>
   <div class="flex gap-2">
     <button
       pButton
       label="Group Settlements"
-      class="p-button-outlined p-mr-2"
+      class="p-button-outlined"
       (click)="showGroupSettlements()"
       [disabled]="!showOverall"
     ></button>
     <button
       pButton
       label="Overall Settlements"
-      class="p-button-outlined p-mr-2"
+      class="p-button-outlined"
       (click)="showOverallSettlements()"
       [disabled]="showOverall"
     ></button>
@@ -19,47 +19,43 @@
       pButton
       label="Settlement History"
       class="p-button-outlined"
-      (click)="showHistroyDialog = true"
+      (click)="showHistoryDialog = true"
     ></button>
   </div>
 </div>
+
 <p-toast></p-toast>
 
-@for (settlement of settlements; track $index) {
-<div class="settlement-item">
-  <div class="settlement-info">
-    <div class="settlement-avatar">{{ settlement.avatar }}</div>
-    <div class="p-grid dir-col">
+@for (settlement of settlements; track settlement) {
+<div class="settlement-item flex align-items-center justify-content-between p-3 border-round border-1">
+  <div class="flex align-items-center gap-3">
+    <div class="settlement-avatar w-3rem h-3rem border-circle bg-primary-100 text-primary-800 flex align-items-center justify-content-center">
+      {{ settlement.avatar }}
+    </div>
+    <div class="flex flex-column">
       <p class="m-0 font-semibold">{{ settlement.title }}</p>
-      <div class="settlement-meta text-secondary">
-        From {{ settlement.source }} expenses
-      </div>
+      <span class="text-sm text-secondary">From {{ settlement.source }} expenses</span>
     </div>
   </div>
-  <div
-    [class]="
-      'settlement-amount ' + (settlement.amount > 0 ? 'positive' : 'negative')
-    "
-  >
-    {{ settlement.amount | currency : "INR" : "symbol" : "1.2-2" }}
+  <div class="flex align-items-center gap-3">
+    <div class="settlement-amount" [ngClass]="settlement.amount > 0 ? 'positive' : 'negative'">
+      {{ settlement.amount | currency: 'INR':'symbol':'1.2-2' }}
+    </div>
+    <button
+      pButton
+      [label]="settlement.amount < 0 ? 'Settle Up' : 'Remind'"
+      [ngClass]="settlement.amount > 0 ? 'p-button-outlined' : 'p-button-info'"
+      (click)="settlement.amount < 0 ? onSettle(settlement) : onRemind(settlement)"
+    ></button>
   </div>
-  <button
-    pButton
-    label="{{ settlement.amount < 0 ? 'Settle Up' : 'Remind' }}"
-    [ngClass]="settlement.amount > 0 ? 'p-button-outlined' : 'p-button-info'"
-    (click)="
-      settlement.amount < 0 ? handleSettleUp(settlement) : showReminder()
-    "
-  ></button>
 </div>
-
 } @empty {
-<div class="no-settlements">No settlements to display.</div>
+<div class="no-settlements text-center p-3">No settlements to display.</div>
 }
 
 <p-dialog
   header="Settlement History"
-  [(visible)]="showHistroyDialog"
+  [(visible)]="showHistoryDialog"
   [modal]="true"
   [style]="{ width: '500px' }"
   [closable]="true"
@@ -67,97 +63,58 @@
   [dismissableMask]="true"
 >
   @if (historySettlements.length) {
-
-  <div class="p-4">
-    <!-- Settlement Timeline -->
-
-    <div class="flex flex-column gap-3">
-      @for (settlement of historySettlements; track $index) {
-      <div
-        class="border-1 border-200 border-round p-3 hover:shadow-2 transition-all transition-duration-300"
-      >
-        <!-- Settlement Flow -->
-        <div class="bg-gray-50 border-round p-3 mb-3">
-          <div class="flex align-items-center justify-content-between">
-            <!-- From User -->
-            <div class="flex flex-column align-items-center text-center">
-              <div
-                class="w-4rem h-4rem border-circle bg-red-100 text-red-800 flex align-items-center justify-content-center mb-2"
-              >
-                {{ getUserName(settlement.fromId).charAt(0).toUpperCase() }}
-              </div>
-              <div class="text-sm font-medium text-900 mb-1">
-                {{ getUserName(settlement.fromId) }}
-              </div>
-              <div class="text-xs text-500">
-                {{ getUserEmail(settlement.fromId) }}
-              </div>
+  <div class="p-4 flex flex-column gap-3">
+    @for (settlement of historySettlements; track settlement) {
+    <div class="border-1 border-round p-3 hover:shadow-2 transition-all transition-duration-300">
+      <div class="bg-gray-50 border-round p-3 mb-3">
+        <div class="flex align-items-center justify-content-between">
+          <div class="flex flex-column align-items-center text-center">
+            <div class="w-3rem h-3rem border-circle bg-red-100 text-red-800 flex align-items-center justify-content-center mb-2">
+              {{ getUserName(settlement.fromId).charAt(0).toUpperCase() }}
             </div>
-
-            <!-- Arrow and Amount -->
-            <div class="flex flex-column align-items-center mx-3">
-              ->
-              <div
-                class="bg-blue-100 text-blue-800 border-round px-3 py-1 mb-2"
-              >
-            <span class="font-bold text-lg">₹{{ settlement.amount }}</span>
-              </div>
-              ->
-              <div class="flex align-items-center gap-1">
-                <div class="w-2rem h-1 bg-primary-400"></div>
-                <i class="pi pi-arrow-right text-primary-600"></i>
-                <div class="w-2rem h-1 bg-primary-400"></div>
-              </div>
+            <div class="text-sm font-medium text-900 mb-1">{{ getUserName(settlement.fromId) }}</div>
+            <div class="text-xs text-500">{{ getUserEmail(settlement.fromId) }}</div>
+          </div>
+          <div class="flex flex-column align-items-center mx-3">
+            <div class="bg-blue-100 text-blue-800 border-round px-3 py-1 mb-2">
+              <span class="font-bold text-lg">₹{{ settlement.amount }}</span>
             </div>
-
-            <!-- To User -->
-            <div class="flex flex-column align-items-center text-center">
-              <div
-                class="w-4rem h-4rem border-circle bg-green-100 text-green-800 flex align-items-center justify-content-center mb-2"
-              >
-                {{ getUserName(settlement.toId).charAt(0).toUpperCase() }}
-              </div>
-              <div class="text-sm font-medium text-900 mb-1">
-                {{ getUserName(settlement.toId) }}
-              </div>
-              <div class="text-xs text-500">
-                {{ getUserEmail(settlement.toId) }}
-              </div>
+            <div class="flex align-items-center gap-1">
+              <div class="w-2rem h-1 bg-primary-400"></div>
+              <i class="pi pi-arrow-right text-primary-600"></i>
+              <div class="w-2rem h-1 bg-primary-400"></div>
             </div>
           </div>
-        </div>
-
-        <!-- Settlement Details -->
-        <div class="grid">
-          <div class="col-12 md:col-6">
-            <div class="flex align-items-center gap-2 mb-2">
-              <i class="pi pi-users text-primary-600"></i>
-              <span class="text-sm text-500">Group:</span>
-              <span class="text-sm font-medium">{{
-                getGroupName(settlement.groupId)
-              }}</span>
+          <div class="flex flex-column align-items-center text-center">
+            <div class="w-3rem h-3rem border-circle bg-green-100 text-green-800 flex align-items-center justify-content-center mb-2">
+              {{ getUserName(settlement.toId).charAt(0).toUpperCase() }}
             </div>
-          </div>
-          <div class="col-12 md:col-6">
-            <div class="flex align-items-center gap-2 mb-2">
-              <i class="pi pi-clock text-primary-600"></i>
-              <span class="text-sm text-500">Settled:</span>
-              <span class="text-sm font-medium">{{
-                formatDate(settlement.settledAt)
-              }}</span>
-            </div>
+            <div class="text-sm font-medium text-900 mb-1">{{ getUserName(settlement.toId) }}</div>
+            <div class="text-xs text-500">{{ getUserEmail(settlement.toId) }}</div>
           </div>
         </div>
       </div>
-      }
+      <div class="grid">
+        <div class="col-12 md:col-6">
+          <div class="flex align-items-center gap-2">
+            <i class="pi pi-users text-primary-600"></i>
+            <span class="text-sm text-500">Group:</span>
+            <span class="text-sm font-medium">{{ getGroupName(settlement.groupId) }}</span>
+          </div>
+        </div>
+        <div class="col-12 md:col-6">
+          <div class="flex align-items-center gap-2">
+            <i class="pi pi-clock text-primary-600"></i>
+            <span class="text-sm text-500">Settled:</span>
+            <span class="text-sm font-medium">{{ formatDate(settlement.settledAt) }}</span>
+          </div>
+        </div>
+      </div>
     </div>
+    }
   </div>
-
-  <!-- Toast for notifications -->
-  <p-toast></p-toast>
-
   } @else {
-  <p class="text-center">No settlement history available.</p>
+  <p class="text-center p-3">No settlement history available.</p>
   }
 </p-dialog>
 

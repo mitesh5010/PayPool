@@ -55,4 +55,9 @@ export interface DisplaySettlement extends Settlement {
   avatar: string;
   title: string;
   source: string;
+  groupAmounts?: {
+    groupId: number;
+    groupName: string;
+    amount: number;
+  }[];
 }
