@@ -141,12 +141,36 @@
                     <div class="text-sm text-600">{{ member.email }}</div>
                   </div>
                 </div>
-
-                <!-- Compact Amount -->
-                <div class="font-bold text-lg text-primary">pending : $500</div>
               </div>
             </div>
-            } }  
+            } }
+            @case (3) {
+              @for (settlement of filteredSettlements(); track settlement) {
+                <div class="settlement-item flex align-items-center justify-content-between p-3 border-round border-1">
+                  <div class="flex align-items-center gap-3">
+                    <div class="settlement-avatar w-3rem h-3rem border-circle bg-primary-100 text-primary-800 flex align-items-center justify-content-center">
+                      {{ settlement.avatar }}
+                    </div>
+                    <div class="flex flex-column">
+                      <p class="m-0 font-semibold">{{ settlement.title }}</p>
+                    </div>
+                  </div>
+                  <div class="flex align-items-center gap-3">
+                    <div class="settlement-amount" [ngClass]="settlement.amount > 0 ? 'positive' : 'negative'">
+                      {{ settlement.amount | currency: 'INR':'symbol':'1.2-2' }}
+                    </div>
+                    <button
+                      pButton
+                      [label]="settlement.amount < 0 ? 'Settle Up' : 'Remind'"
+                      [ngClass]="settlement.amount > 0 ? 'p-button-outlined' : 'p-button-info'"
+                      (click)="settlement.amount < 0 ? onSettle(settlement) : onRemind(settlement); $event.stopPropagation()"
+                    ></button>
+                  </div>
+                </div>
+                } @empty {
+                <div class="no-settlements text-center p-3">No settlements to display.</div>
+                }
+            }
             @default {
             <p>Default content for other tabs</p>
             } }
@@ -158,12 +182,6 @@
   </form>
   <ng-template pTemplate="footer">
     <div class="flex gap-3 flex-wrap justify-content-center">
-      <p-button
-        label="Settle Up"
-        styleClass="p-button-success w-full"
-        icon="pi pi-check"
-      >
-      </p-button>
       <p-button
         label="Add Member"
         styleClass="p-button-outlined w-full"
@@ -179,3 +197,9 @@
     </div>
   </ng-template>
 </p-dialog>
+<p-toast />
+<app-pin-verification-dialog
+  [visible]="verifyDialog"
+  (verified)="handlePinVerificationSuccess($event)"
+  (close)="onClosePinDialog()"
+/>
