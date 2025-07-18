@@ -42,7 +42,7 @@
         
         <div class="flex justify-content-between">
           <button pButton label="View Details" class="p-button-outlined p-button-sm" (click)="openViewGroupDialog(group.id!)"></button>
-          <button pButton label="Add Expense" class="p-button-primary p-button-sm" (click)="openExpenseDialog(group.id!)"></button>
+          <button pButton label="Add Expense" class="p-button-primary p-button-sm" (click)="openExpenseDialog(group.id!); $event.stopPropagation()"></button>
         </div>
       </p-card>
   </div>
