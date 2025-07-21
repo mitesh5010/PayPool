@@ -47,7 +47,7 @@ export interface Settlement {
   fromId: number;
   toId: number;
   amount: number;
-  groupId: number;
+  groupId: number | null;
   status: "pending" | "settled";
   settledAt?: Date;
 }

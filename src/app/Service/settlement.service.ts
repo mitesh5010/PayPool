@@ -11,7 +11,7 @@ export class SettlementService {
     if (!expenses.length || !users.length) return [];
 
     const balances = this.calculateBalances(expenses, existingSettlements);
-    const settlements = this.createSettlements(balances, 0);
+    const settlements = this.createSettlements(balances, null);
     return this.transformSettlements(settlements, users, currentUserId, 'All');
   }
 
@@ -47,7 +47,7 @@ export class SettlementService {
     return balances;
   }
 
-  private createSettlements(balances: Map<number, number>, groupId: number): Settlement[] {
+  private createSettlements(balances: Map<number, number>, groupId: number | null): Settlement[] {
     const debtors: { id: number; amount: number }[] = [];
     const creditors: { id: number; amount: number }[] = [];
 
@@ -68,7 +68,7 @@ export class SettlementService {
   private generateSettlements(
     debtors: { id: number; amount: number }[],
     creditors: { id: number; amount: number }[],
-    groupId: number
+    groupId: number | null
   ): Settlement[] {
     const settlements: Settlement[] = [];
     let debtorIndex = 0;
