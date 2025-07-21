@@ -60,6 +60,7 @@ export class ViewGroupComponent implements OnInit {
   verifyDialog = false;
   currentSettlement: DisplaySettlement | null = null;
   filteredSettlements = signal<DisplaySettlement[]>([]);
+  readonly showSettleTab = input<boolean>(false);
 
   tabs: { value: number; title: string }[] =  [
   { value: 1, title: 'Expenses' },
@@ -91,11 +92,14 @@ export class ViewGroupComponent implements OnInit {
       complete: () => this.loading.hide()
     });
     
-    this.tabs = [
-      { value: 1, title: 'Expenses' },
-      { value: 2, title: 'Members' },
-      { value: 3, title: 'Settle Up' },
-    ];
+    this.tabs = this.showSettleTab() 
+    ? [
+        { value: 3, title: 'Settle Up' }
+      ]
+    : [
+        { value: 1, title: 'Expenses' },
+        { value: 2, title: 'Members' }
+      ];
   }
 
   filteredExpenses() {
@@ -246,6 +250,16 @@ export class ViewGroupComponent implements OnInit {
   }
 
   onClose() {
-    this.close.emit();
+   
+  
+  // Reset any component state if needed
+  this.currentSettlement = null;
+  this.verifyDialog = false;
+  
+  // Emit the close event to parent component
+  this.close.emit();
+  }
+  onHide(){
+    this.onClose();
   }
 }

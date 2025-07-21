@@ -52,6 +52,7 @@ export class GroupsComponent implements OnInit {
   selectedGroupId: number = 0;
   userId: number = 0;
   allExpenses!:Expense[];
+  showSettleDialog = false;
 
   constructor(private fb: FormBuilder, private apiService: ApiService, private auth: AuthService, private splitCal: SplitCalculationService, private loading: LoadingService) {}
 
@@ -130,6 +131,12 @@ export class GroupsComponent implements OnInit {
   openViewGroupDialog(groupId: number) {
     this.selectedGroupId = groupId;
     this.showViewGroupDialog = true;
+    this.showSettleDialog = false; 
+  }
+  viewSettleDialog(groupId: number) {
+    this.selectedGroupId = groupId;
+    this.showSettleDialog = true;
+    this.showViewGroupDialog = false;
   }
 
   submitGroup() {
