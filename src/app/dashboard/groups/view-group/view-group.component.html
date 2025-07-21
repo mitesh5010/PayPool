@@ -161,6 +161,7 @@
                     </div>
                     <button
                       pButton
+                      type="button"
                       [label]="settlement.amount < 0 ? 'Settle Up' : 'Remind'"
                       [ngClass]="settlement.amount > 0 ? 'p-button-outlined' : 'p-button-info'"
                       (click)="settlement.amount < 0 ? onSettle(settlement) : onRemind(settlement); $event.stopPropagation()"
