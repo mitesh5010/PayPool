@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, signal, ViewEncapsulation } from '@angular/core';
 import { SidebarComponent } from "../shared/sidebar/sidebar.component";
 import { RouterOutlet } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
@@ -25,6 +25,7 @@ import { DashboardService } from '../Service/dashboard.service';
 })
 export class DashboardComponent implements OnInit {
   user!:User;
+  sidebarOpen = signal(true);
 
   constructor(private auth: AuthService, private dashboardService: DashboardService){
   }
@@ -52,5 +53,8 @@ export class DashboardComponent implements OnInit {
     .slice(0, 2) // Take only first 2 initials
     .join('');
 }
+  toggleSidebar() {
+    this.sidebarOpen.update(open => !open);
+  }
   
 }

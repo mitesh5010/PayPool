@@ -82,3 +82,7 @@
 .p-button-outlined:hover {
   background: #f1f5f9 !important;
 }
+
+.p-tabview .p-tabview-panels {
+  transition: all 0.3s ease;
+}

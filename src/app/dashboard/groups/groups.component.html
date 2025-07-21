@@ -1,6 +1,6 @@
  <div class="p-d-flex ai-center p-jc-between p-mb-3 row">
     <h2 class="p-text-2xl font-bold">Groups</h2>
-    <button pButton type="button" label="Create Group" icon="pi pi-plus" class="p-button-primary p-px-4 p-py-2 p-button-rounded" style="font-weight: 400;" (click)="showGroupDialog =true"></button>
+    <button pButton type="button" label="Create Group" icon="pi pi-plus" class="p-button-primary p-px-4 p-py-2 p-button-rounded gap-1" style="font-weight: 400;" (click)="showGroupDialog =true"></button>
   </div>
   <div class="flex flex-wrap gap-4">
     @for (group of groups; track $index) {
@@ -42,6 +42,7 @@
         
         <div class="flex justify-content-between">
           <button pButton label="View Details" class="p-button-outlined p-button-sm" (click)="openViewGroupDialog(group.id!)"></button>
+          <p-button icon="pi pi-wallet" [rounded]="true" [text]="true" [raised]="true" severity="info" (click)="openViewGroupDialog(group.id!); $event.stopPropagation()" />
           <button pButton label="Add Expense" class="p-button-primary p-button-sm" (click)="openExpenseDialog(group.id!); $event.stopPropagation()"></button>
         </div>
       </p-card>

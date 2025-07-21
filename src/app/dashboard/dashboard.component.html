@@ -34,8 +34,9 @@
     <div class="design-section">
       <div class="design-content">
         <div class="modern-dashboard">
-          <app-sidebar />
-          <div class="main-content">
+          <app-sidebar [isOpen]="sidebarOpen()" 
+    (isOpenChange)="sidebarOpen.set($event)" />
+          <div class="main-content" [class.content-collapsed]="!sidebarOpen()">
           <router-outlet />
           </div>
         </div>

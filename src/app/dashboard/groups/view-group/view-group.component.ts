@@ -27,6 +27,8 @@ import { forkJoin } from 'rxjs';
 import { AuthService } from '../../../auth/auth.service';
 import { Toast } from "primeng/toast";
 
+type TabValue = 1 | 2 | 3;
+
 @Component({
   selector: 'app-view-group',
   imports: [
@@ -59,7 +61,11 @@ export class ViewGroupComponent implements OnInit {
   currentSettlement: DisplaySettlement | null = null;
   filteredSettlements = signal<DisplaySettlement[]>([]);
 
-  tabs: { value: number; title: string }[] = [];
+  tabs: { value: number; title: string }[] =  [
+  { value: 1, title: 'Expenses' },
+  { value: 2, title: 'Members' },
+  { value: 3, title: 'Settle Up' },
+  ];
 
   constructor(
     private apiService: ApiService,

@@ -10,3 +10,23 @@
   width: 8rem;
   height: auto;
 }
+
+/* Add to your existing app.component.css */
+.main-content {
+  margin-left: 250px;
+  transition: margin-left 0.3s ease;
+}
+
+.content-collapsed {
+  margin-left: 60px;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0 !important;
+  }
+  
+  .sidebar.collapsed {
+    transform: translateX(-100%);
+  }
+}
