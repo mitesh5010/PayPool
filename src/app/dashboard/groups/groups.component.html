@@ -42,7 +42,7 @@
         
         <div class="flex justify-content-between">
           <button pButton label="View Details" class="p-button-outlined p-button-sm" (click)="openViewGroupDialog(group.id!)"></button>
-          <p-button icon="pi pi-wallet" [rounded]="true" [text]="true" [raised]="true" severity="info" (click)="openViewGroupDialog(group.id!); $event.stopPropagation()" />
+          <p-button icon="pi pi-wallet" [rounded]="true" [text]="true" [raised]="true" severity="info" (click)="viewSettleDialog(group.id!); $event.stopPropagation()" />
           <button pButton label="Add Expense" class="p-button-primary p-button-sm" (click)="openExpenseDialog(group.id!); $event.stopPropagation()"></button>
         </div>
       </p-card>
@@ -118,3 +118,13 @@
    [groups]="groups"
    [allExpenses]="allExpenses"
   ></app-view-group>
+
+  <!-- Settle Dialog -->
+<app-view-group 
+  [visible]="showSettleDialog" 
+  [groupId]="selectedGroupId" 
+  [groups]="groups"
+  [allExpenses]="allExpenses"
+  [showSettleTab]="true"
+  (close)="showSettleDialog = false">
+</app-view-group>

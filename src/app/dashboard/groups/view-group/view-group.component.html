@@ -2,15 +2,13 @@
   header="{{ viewGroup()?.name }}"
   [visible]="visible()"
   [modal]="true"
-  [closable]="true"
   [style]="{ width: '700px', height: '800px' }"
   [contentStyle]="{ 'overflow-y': 'auto', height: '800px' }"
   [draggable]="false"
   (onHide)="onClose()"
 >
-  <form>
     <div class="card">
-      <p-tabs [value]="1">
+      <p-tabs [value]="showSettleTab() ? 3 : 1 ">
         <p-tablist>
           @for (tab of tabs; track tab.value) {
           <p-tab [value]="tab.value">{{ tab.title }}</p-tab>
@@ -180,7 +178,6 @@
         </p-tabpanels>
       </p-tabs>
     </div>
-  </form>
   <ng-template pTemplate="footer">
     <div class="flex gap-3 flex-wrap justify-content-center">
       <p-button
