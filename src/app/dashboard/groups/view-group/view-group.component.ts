@@ -156,7 +156,6 @@ export class ViewGroupComponent implements OnInit {
   }
 
   onSettle(settlement: DisplaySettlement): void {
-    event?.preventDefault();
     if (settlement.amount < 0) {
       this.handleSettleUp(settlement);
     } else {
@@ -171,7 +170,7 @@ export class ViewGroupComponent implements OnInit {
   private handleSettleUp(settlement: DisplaySettlement): void {
     this.currentSettlement = settlement;
     this.verifyDialog = true;
-  this.cdr.detectChanges();
+    this.cdr.detectChanges();
   }
 
   handlePinVerificationSuccess(isValid: boolean): void {
@@ -181,6 +180,7 @@ export class ViewGroupComponent implements OnInit {
         summary: 'Error',
         detail: 'Invalid PIN. Please try again.'
       });
+      this.resetSettlementState();
       return;
     }
 
@@ -190,27 +190,29 @@ export class ViewGroupComponent implements OnInit {
         summary: 'Error',
         detail: 'No settlement selected.'
       });
+      this.resetSettlementState();
       return;
     }
 
     this.processSettlement(this.currentSettlement);
     this.resetSettlementState();
   }
+
   private resetSettlementState(): void {
-  this.currentSettlement = null;
-  this.verifyDialog = false;
-  this.cdr.detectChanges(); // Trigger change detection if needed
-}
-onClosePinDialog(): void {
-  this.resetSettlementState();
-}
+    this.currentSettlement = null;
+    this.verifyDialog = false;
+  }
+
+  onClosePinDialog(): void {
+    this.resetSettlementState();
+  }
 
   private processSettlement(settlement: DisplaySettlement): void {
     this.loading.show();
     const newSettlement: Settlement = {
       fromId: this.auth.getUserId(),
       toId: settlement.toId,
-      amount: settlement.amount,
+      amount: Math.abs(settlement.amount), // Always positive
       groupId: this.viewGroup()?.id!,
       status: 'settled',
       settledAt: new Date()

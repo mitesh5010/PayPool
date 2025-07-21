@@ -120,7 +120,7 @@ export class SettlementService {
             ? `You owe ${toUser?.name || 'Unknown'}`
             : `${fromUser?.name || 'Unknown'} owes you`,
           source,
-          amount: isCurrentUserPayer ? -settlement.amount : settlement.amount
+          amount: isCurrentUserPayer ? -Math.abs(settlement.amount) : Math.abs(settlement.amount)
         };
       });
   }

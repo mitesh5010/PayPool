@@ -126,31 +126,37 @@ export class SettlementsComponent implements OnInit {
     this.verifyDialog = false;
     setTimeout(()=>{
       this.verifyDialog = true;
-    })
+    });
   }
 
   handlePinVerificationSuccess(isValid: boolean): void {
     if (!isValid) {
-    this.messageService.add({
-      severity: 'error',
-      summary: 'Error',
-      detail: 'Invalid PIN. Please try again.'
-    });
-    return;
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Invalid PIN. Please try again.'
+      });
+      this.resetSettlementState();
+      return;
+    }
+
+    if (!this.currentSettlement) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No settlement selected.'
+      });
+      this.resetSettlementState();
+      return;
+    }
+
+    this.processSettlement(this.currentSettlement);
+    this.resetSettlementState();
   }
 
-  if (!this.currentSettlement) {
-    this.messageService.add({
-      severity: 'error',
-      summary: 'Error',
-      detail: 'No settlement selected.'
-    });
-    return;
-  }
-
-  this.processSettlement(this.currentSettlement);
-  this.currentSettlement = null;
-  this.verifyDialog = false;
+  private resetSettlementState(): void {
+    this.currentSettlement = null;
+    this.verifyDialog = false;
   }
 
   private processSettlement(settlement: DisplaySettlement): void {
@@ -158,7 +164,7 @@ export class SettlementsComponent implements OnInit {
     const newSettlement: Settlement = {
       fromId: this.userId,
       toId: settlement.toId,
-      amount: Math.abs(settlement.amount),
+      amount: Math.abs(settlement.amount), // Always positive
       groupId: settlement.groupId,
       status: 'settled',
       settledAt: new Date()
@@ -182,12 +188,12 @@ export class SettlementsComponent implements OnInit {
           summary: 'Error',
           detail: 'Failed to complete settlement. Please try again.'
         });
-      // Reopen dialog if there was an error
-      setTimeout(() => {
-        this.currentSettlement = settlement;
-        this.verifyDialog = true;
-      });
-    },
+        // Reopen dialog if there was an error
+        setTimeout(() => {
+          this.currentSettlement = settlement;
+          this.verifyDialog = true;
+        });
+      },
       complete: () => this.loading.hide()
     });
   }

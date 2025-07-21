@@ -1,4 +1,4 @@
-<p-dialog header="Verify Your Identity" [(visible)]="visible" [style]="{width: '450px'}" [modal]="true">
+<p-dialog header="Verify Your Identity" [(visible)]="visible" [style]="{width: '450px'}" [modal]="true" (onHide)="onHide()">
   <div class="p-fluid">
     <div class="text-center mb-4">
       <i class="pi pi-lock text-4xl text-primary"></i>
@@ -32,9 +32,10 @@
         </button>
         <button 
           pButton 
-          type="button" 
+          type="button"
           label="Cancel" 
           class="p-button-secondary" 
+          (click)="onHide()"
           >
         </button>
       </div>
