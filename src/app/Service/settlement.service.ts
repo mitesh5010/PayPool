@@ -23,7 +23,7 @@ export class SettlementService {
       const groupSettlements = existingSettlements.filter(s => s.groupId === group.id);
       const balances = this.calculateBalances(groupExpenses, groupSettlements);
       const settlements = this.createSettlements(balances, group.id ?? 0);
-      return this.transformSettlements(settlements, users, currentUserId, group.name);
+      return this.transformSettlements(settlements, users, currentUserId, group?.name ?? 'Group');
     });
   }
 
