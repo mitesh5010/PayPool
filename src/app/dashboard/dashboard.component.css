@@ -182,7 +182,6 @@
 /* Container and Layout */
 .container {
   margin: 0 auto;
-  margin-top: 5rem;
 }
 
 .design-section {
@@ -237,4 +236,68 @@ app-sidebar, .app-sidebar-area {
 /* Main Content Area */
 .main-content {
   padding: 2rem;
+}
+
+/* Main App Container */
+.app-container {
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Modern Dashboard Layout */
+.modern-dashboard {
+  display: flex;
+  min-height: calc(100vh - 5rem);
+  margin-top: 5rem;
+}
+
+/* Main Content Area */
+.main-content {
+  flex-grow: 1;
+  padding: 2rem;
+  transition: margin-left 0.3s ease;
+  background: #f8fafc;
+}
+
+.content-collapsed {
+  margin-left: 80px;
+}
+
+/* User Avatar Styles (same as your existing styles) */
+.user-avatar {
+  position: absolute;
+  top: 1rem;
+  right: 1.5rem;
+  z-index: 999;
+}
+
+.avatar-enhanced {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 2px solid transparent;
+  background: linear-gradient(135deg, #667eea,#1490fc) !important;
+  color: white !important;
+  font-weight: 600 !important;
+  font-size: 20px !important;
+}
+
+/* Rest of your existing avatar and overlay styles... */
+/* (Keep all the styles you already have for avatar, overlay, etc.) */
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .modern-dashboard {
+    flex-direction: column;
+    margin-top: 4rem;
+  }
+  
+  .main-content {
+    margin-left: 0 !important;
+    padding: 1rem;
+  }
+  
+  .user-avatar {
+    top: 0.75rem;
+    right: 1rem;
+  }
 }
