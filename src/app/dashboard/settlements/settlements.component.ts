@@ -43,6 +43,9 @@ export class SettlementsComponent implements OnInit {
   allSettlements: Settlement[] = [];
   showOverall = true;
 
+  userMap = new Map<number, User>();
+  groupMap = new Map<number, Group>();
+
   constructor(
     private auth: AuthService,
     private apiService: ApiService,
@@ -71,6 +74,8 @@ export class SettlementsComponent implements OnInit {
         this.users = users;
         this.expenses = expenses;
         this.groups = groups;
+        this.userMap = new Map(users.map(user => [user.id, user]));
+        this.groupMap = new Map(groups.map(group => [group.id!, group]));
         this.allSettlements = settlements;
         this.refreshSettlements();
         this.loadHistory();
@@ -88,15 +93,10 @@ export class SettlementsComponent implements OnInit {
 
   private loadHistory(): void {
     this.loading.show();
-    this.apiService.getAllSettlements().subscribe({
-      next: (settlements) => {
-        this.historySettlements = settlements
-          .filter(s => s.status === 'settled' && (s.fromId === this.userId || s.toId === this.userId))
-          .reverse();
-      },
-      error: (err) => console.error('Failed to load history:', err),
-      complete: () => this.loading.hide()
-    });
+    this.historySettlements = this.allSettlements
+  .filter(s => s.status === 'settled' && (s.fromId === this.userId || s.toId === this.userId))
+  .reverse();
+    this.loading.hide();
   }
 
   onRemind(settlement: DisplaySettlement): void {
@@ -123,10 +123,9 @@ export class SettlementsComponent implements OnInit {
 
   private handleSettleUp(settlement: DisplaySettlement): void {
     this.currentSettlement = settlement;
-    this.verifyDialog = false;
-    setTimeout(()=>{
+    if (!this.verifyDialog) {
       this.verifyDialog = true;
-    });
+    }
   }
 
   handlePinVerificationSuccess(isValid: boolean): void {
@@ -136,7 +135,6 @@ export class SettlementsComponent implements OnInit {
         summary: 'Error',
         detail: 'Invalid PIN. Please try again.'
       });
-      this.resetSettlementState();
       return;
     }
 
@@ -146,7 +144,6 @@ export class SettlementsComponent implements OnInit {
         summary: 'Error',
         detail: 'No settlement selected.'
       });
-      this.resetSettlementState();
       return;
     }
 
@@ -217,16 +214,16 @@ export class SettlementsComponent implements OnInit {
   }
 
   getUserName(userId: number): string {
-    return this.users.find(u => u.id === userId)?.name ?? 'Unknown User';
-  }
+  return this.userMap.get(userId)?.name ?? 'Unknown User';
+}
 
-  getUserEmail(userId: number): string {
-    return this.users.find(u => u.id === userId)?.email ?? 'unknown@example.com';
-  }
+getUserEmail(userId: number): string {
+  return this.userMap.get(userId)?.email ?? 'unknown@example.com';
+}
 
-  getGroupName(groupId: number): string {
-    return this.groups.find(g => g.id === groupId)?.name ?? 'Unknown Group';
-  }
+getGroupName(groupId: number): string {
+  return this.groupMap.get(groupId)?.name ?? 'Unknown Group';
+}
 
   formatDate(date: Date | string | undefined): string {
     if (!date) return 'N/A';
