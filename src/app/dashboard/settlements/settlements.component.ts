@@ -109,6 +109,14 @@ export class SettlementsComponent implements OnInit {
 
   onSettle(settlement: DisplaySettlement): void {
     if (settlement.amount < 0) {
+       if (this.showOverall) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Settle in Group View',
+      detail: 'Please switch to group settlements to settle this balance.'
+    });
+    return;
+  }
       this.handleSettleUp(settlement);
       // console.log('click');
       
