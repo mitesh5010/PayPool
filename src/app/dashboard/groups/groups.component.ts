@@ -110,9 +110,10 @@ export class GroupsComponent implements OnInit {
 
         this.groups = this.apiService.filterUserGroups(allGroups, this.userId).map(group => {
         const stats = this.splitCal.calculateGroupStats(allExpenses, group, this.userId,settlements.filter(s => s.groupId === group.id));
-        this.loading.hide();
-        return { ...group, ...stats };
+        const isSettled = stats.youOwe === 0 && stats.owedToYou === 0;
+        return { ...group, ...stats, status: isSettled ? 'SETTLED' : 'ACTIVE' };
       });
+      this.loading.hide();
       },
       error: err => console.error('Failed to load data:', err)
     })
@@ -146,7 +147,7 @@ export class GroupsComponent implements OnInit {
       const newGroup: Group = {
         name: formValue.name,
         description: formValue.description || '',
-        status: 'ACTIVE',
+        status: 'SETTLED',
         userId: this.userId,
         members: formValue.members.map((member: User) => ({
           id: member.id,
