@@ -171,4 +171,7 @@ export class GroupsComponent implements OnInit {
       });
     }
   }
+  handleSettlementComplete() {
+    this.loadData(); // ✅ refresh group data and status
+  }
 }
