@@ -126,5 +126,6 @@
   [groups]="groups"
   [allExpenses]="allExpenses"
   [showSettleTab]="true"
+  (settlementCompleted)="handleSettlementComplete()"
   (close)="showSettleDialog = false">
 </app-view-group>

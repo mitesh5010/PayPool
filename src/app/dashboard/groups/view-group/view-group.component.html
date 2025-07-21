@@ -119,7 +119,9 @@
                 }
               </div>
             </p-card>
-            } }
+            }@empty {
+                <div class="no-settlements text-center p-3">No Expenses to display.</div>
+                } }
                @case (2){ @for (member of viewGroup()?.members ?? []; track
             member.id) {
 
@@ -141,7 +143,9 @@
                 </div>
               </div>
             </div>
-            } }
+            }@empty {
+                <div class="no-settlements text-center p-3">No Members to display.</div>
+                } }
             @case (3) {
               @for (settlement of filteredSettlements(); track settlement) {
                 <div class="settlement-item flex align-items-center justify-content-between p-3 border-round border-1">
