@@ -85,7 +85,7 @@ export class ExpensesComponent implements OnInit {
     if (this.userId === id) {
       return "You"
     } else {
-      const user = this.users.find(u => u.id === id);
+      const user = this.users?.find(u => u.id === id);
       return user ? user.name : '';
     } 
   }

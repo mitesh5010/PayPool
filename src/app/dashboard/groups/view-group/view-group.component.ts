@@ -61,6 +61,7 @@ export class ViewGroupComponent implements OnInit {
   currentSettlement: DisplaySettlement | null = null;
   filteredSettlements = signal<DisplaySettlement[]>([]);
   readonly showSettleTab = input<boolean>(false);
+  readonly settlementCompleted = output<void>();
 
   tabs: { value: number; title: string }[] =  [
   { value: 1, title: 'Expenses' },
@@ -235,6 +236,7 @@ export class ViewGroupComponent implements OnInit {
           summary: 'Success',
           detail: 'Settlement completed successfully!'
         });
+        this.settlementCompleted.emit();
         this.loadGroupSettlements();
       },
       error: (err) => {
