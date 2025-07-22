@@ -5,13 +5,14 @@ import { catchError, map, tap } from 'rxjs';
 import { DecodedToken, User } from '../Service/data.model';
 import { jwtDecode } from 'jwt-decode';
 import { LoadingService } from '../Service/loading.service';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  private api = 'http://localhost:3000';
+  private api = `${environment.apiUrl}`;
 
   userSignal = signal<User | null>(null)
 
