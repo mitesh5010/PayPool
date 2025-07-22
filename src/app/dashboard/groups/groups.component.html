@@ -1,131 +1,104 @@
- <div class="p-d-flex ai-center p-jc-between p-mb-3 row">
-    <h2 class="p-text-2xl font-bold">Groups</h2>
-    <button pButton type="button" label="Create Group" icon="pi pi-plus" class="p-button-primary p-px-4 p-py-2 p-button-rounded gap-1" style="font-weight: 400;" (click)="showGroupDialog =true"></button>
-  </div>
-  <div class="flex flex-wrap gap-4">
-    @for (group of groups; track $index) {
-      <div class="p-grid nogutter justify-center w-4" >
-      <p-card [style]="{ 'margin-bottom': '1rem', 'cursor': 'pointer' }" styleClass="shadow-2 hover:shadow-4 transition-all" (click)="openViewGroupDialog(group.id!)">
-        <div class="flex justify-content-between align-items-start mb-3">
-          <div>
-            <div class="text-xl font-semibold text-900">{{ group.name }}</div>
-            <div class="text-sm font-semibold text-500">{{ group.members.length }} members</div>
-          </div>
-          @if (group.status === 'SETTLED') {
-            <span class="text-xs px-2 py-1 border-round font-semibold bg-blue-100 text-blue-700">
-              {{ group.status }}
-            </span>
-          }
-          @if (group.status === 'ACTIVE') {
-            <span class="text-xs px-2 py-1 border-round font-semibold bg-green-100 text-green-700">
-              {{ group.status }}
-            </span>
-          }
-        </div>
-
-        <div class="grid">
-          <div class="col-4 text-center">
-            <div class="text-lg font-bold text-900">&#8377; {{ group.total | number:'1.2-2' }}</div>
-            <div class="text-sm text-gray-800">Total</div>
-          </div>
-          <div class="col-4 text-center">
-            <div class="text-lg font-bold text-red-600">&#8377; {{ group.youOwe | number:'1.2-2' }}</div>
-            <div class="text-sm text-gray-800">You Owe</div>
-          </div>
-          <div class="col-4 text-center">
-            <div class="text-lg font-bold text-green-600">&#8377; {{ group.owedToYou | number:'1.2-2' }}</div>
-            <div class="text-sm text-gray-800">Owed to You</div>
-          </div>
-        </div>
-        
-        <p-divider class="my-3"></p-divider>
-        
-        <div class="flex justify-content-between">
-          <button pButton label="View Details" class="p-button-outlined p-button-sm" (click)="openViewGroupDialog(group.id!)"></button>
-          <p-button icon="pi pi-wallet" [rounded]="true" [text]="true" [raised]="true" severity="info" (click)="viewSettleDialog(group.id!); $event.stopPropagation()" />
-          <button pButton label="Add Expense" class="p-button-primary p-button-sm" (click)="openExpenseDialog(group.id!); $event.stopPropagation()"></button>
-        </div>
-      </p-card>
-  </div>
-}
+<div class="p-d-flex ai-center p-jc-between p-mb-3 row">
+  <h2 class="p-text-2xl font-bold">Groups</h2>
+  <button pButton type="button" label="Create Group" icon="pi pi-plus"
+    class="p-button-primary p-px-4 p-py-2 p-button-rounded gap-1" style="font-weight: 400;"
+    (click)="showGroupDialog =true"></button>
 </div>
+@if (!isLoading) {
+  @if (!groups || groups.length === 0) {
+    <div>No Groups for You!</div>
+  }
+<div class="flex flex-wrap gap-4">
+  @for (group of groups; track $index) {
+  <div class="p-grid nogutter justify-center w-4">
+    <p-card [style]="{ 'margin-bottom': '1rem', 'cursor': 'pointer' }"
+      styleClass="shadow-2 hover:shadow-4 transition-all" (click)="openViewGroupDialog(group.id!)">
+      <div class="flex justify-content-between align-items-start mb-3">
+        <div>
+          <div class="text-xl font-semibold text-900">{{ group.name }}</div>
+          <div class="text-sm font-semibold text-500">{{ group.members.length }} members</div>
+        </div>
+        @if (group.status === 'SETTLED') {
+        <span class="text-xs px-2 py-1 border-round font-semibold bg-blue-100 text-blue-700">
+          {{ group.status }}
+        </span>
+        }
+        @if (group.status === 'ACTIVE') {
+        <span class="text-xs px-2 py-1 border-round font-semibold bg-green-100 text-green-700">
+          {{ group.status }}
+        </span>
+        }
+      </div>
 
-@if (!groups || groups.length === 0) {
-  <div>No Groups for You!</div>
+      <div class="grid">
+        <div class="col-4 text-center">
+          <div class="text-lg font-bold text-900">&#8377; {{ group.total | number:'1.2-2' }}</div>
+          <div class="text-sm text-gray-800">Total</div>
+        </div>
+        <div class="col-4 text-center">
+          <div class="text-lg font-bold text-red-600">&#8377; {{ group.youOwe | number:'1.2-2' }}</div>
+          <div class="text-sm text-gray-800">You Owe</div>
+        </div>
+        <div class="col-4 text-center">
+          <div class="text-lg font-bold text-green-600">&#8377; {{ group.owedToYou | number:'1.2-2' }}</div>
+          <div class="text-sm text-gray-800">Owed to You</div>
+        </div>
+      </div>
+
+      <p-divider class="my-3"></p-divider>
+
+      <div class="flex justify-content-between">
+        <button pButton label="View Details" class="p-button-outlined p-button-sm"
+          (click)="openViewGroupDialog(group.id!)"></button>
+        <p-button icon="pi pi-wallet" [rounded]="true" [text]="true" [raised]="true" severity="info"
+          (click)="viewSettleDialog(group.id!); $event.stopPropagation()" />
+        <button pButton label="Add Expense" class="p-button-primary p-button-sm"
+          (click)="openExpenseDialog(group.id!); $event.stopPropagation()"></button>
+      </div>
+    </p-card>
+  </div>
+  }
+</div>
 }
 <!-- Click create group-- Pop up Dialog card -->
 
-<p-dialog
-  header="Create Group"
-  [(visible)]="showGroupDialog"
-  [modal]="true"
-  [closable]="false"
-  [style]="{ width: '400px' }"
-  [contentStyle]="{ 'overflow': 'visible', 'max-height': 'none' }"
-  [blockScroll]="true"
-  [draggable]="false"
-  [styleClass]="'custom-modal'"
->
-  <form [formGroup]="newGroup" (ngSubmit)="submitGroup()" class="flex flex-column gap-3" >
+<p-dialog header="Create Group" [(visible)]="showGroupDialog" [modal]="true" [closable]="false"
+  [style]="{ width: '400px' }" [contentStyle]="{ 'overflow': 'visible', 'max-height': 'none' }" [blockScroll]="true"
+  [draggable]="false" [styleClass]="'custom-modal'">
+  <form [formGroup]="newGroup" (ngSubmit)="submitGroup()" class="flex flex-column gap-3">
     <div>
       <label class="block text-sm font-medium mb-1">Group Name</label>
-      <input pInputText  formControlName="name" placeholder="Enter group name" />
+      <input pInputText formControlName="name" placeholder="Enter group name" />
     </div>
 
     <div>
       <label class="block text-sm font-medium mb-1">Description</label>
-      <input pInputText class="w-full" formControlName="description"  placeholder="What's this group for?" />
+      <input pInputText class="w-full" formControlName="description" placeholder="What's this group for?" />
     </div>
 
     <div>
       <label class="block text-sm font-medium mb-1">Members</label>
-      <p-multiSelect
-        [options]="allMembers"
-        formControlName="members"
-        optionLabel="name"
-        display="chip"
-        [showToggleAll]="false"
-        [filter]="true"
-        [showHeader]="false"
-        [selectedItemsLabel]="'{0} selected'"
-        [panelStyle]="{ 'min-width': '220px', 'max-height': '210px', 'overflow-y': 'auto' }"
-        class="w-full"
-        [showClear]="true"
-        [virtualScroll]="true"
-        [virtualScrollItemSize]="38"
-        checkbox="true"
-        [appendTo]="'body'"
-        placeholder="Select Members"
-      ></p-multiSelect>
+      <p-multiSelect [options]="allMembers" formControlName="members" optionLabel="name" display="chip"
+        [showToggleAll]="false" [filter]="true" [showHeader]="false" [selectedItemsLabel]="'{0} selected'"
+        [panelStyle]="{ 'min-width': '220px', 'max-height': '210px', 'overflow-y': 'auto' }" class="w-full"
+        [showClear]="true" [virtualScroll]="true" [virtualScrollItemSize]="38" checkbox="true" [appendTo]="'body'"
+        placeholder="Select Members"></p-multiSelect>
     </div>
     <div class="flex justify-end gap-2 mt-4">
       <button pButton type="button" label="Cancel" class="p-button-text" (click)="showGroupDialog = false"></button>
-      <button pButton type="submit" label="Create Group" class="p-button-primary" [disabled]="newGroup.invalid"></button>
+      <button pButton type="submit" label="Create Group" class="p-button-primary"
+        [disabled]="newGroup.invalid"></button>
     </div>
   </form>
 </p-dialog>
 
-<app-add-expense-dialog 
-  [visible]="showExDialog"
-  [groups]="groups"
-  (close)="handleExpenseDialogClose($event)"
-  [preSelectedGroupId]="selectedGroupId"/>
+<app-add-expense-dialog [visible]="showExDialog" [groups]="groups" (close)="handleExpenseDialogClose($event)"
+  [preSelectedGroupId]="selectedGroupId" />
 
-  <app-view-group 
-   [visible]="showViewGroupDialog"
-   (close)="showViewGroupDialog = false"
-   [groupId]="selectedGroupId"
-   [groups]="groups"
-   [allExpenses]="allExpenses"
-  ></app-view-group>
+<app-view-group [visible]="showViewGroupDialog" (close)="showViewGroupDialog = false" [groupId]="selectedGroupId"
+  [groups]="groups" [allExpenses]="allExpenses"></app-view-group>
 
-  <!-- Settle Dialog -->
-<app-view-group 
-  [visible]="showSettleDialog" 
-  [groupId]="selectedGroupId" 
-  [groups]="groups"
-  [allExpenses]="allExpenses"
-  [showSettleTab]="true"
-  (settlementCompleted)="handleSettlementComplete()"
-  (close)="showSettleDialog = false">
+<!-- Settle Dialog -->
+<app-view-group [visible]="showSettleDialog" [groupId]="selectedGroupId" [groups]="groups" [allExpenses]="allExpenses"
+  [showSettleTab]="true" (settlementCompleted)="handleSettlementComplete()" (close)="showSettleDialog = false">
 </app-view-group>

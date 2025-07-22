@@ -150,6 +150,7 @@ export class AddExpenseDialogComponent implements OnInit, OnChanges {
   private loadCategories(): void {
     this.api.getCategories().subscribe((categories: Category[]) => {
       this.categories = categories;
+      this.loading.hide();
     });
   }
 
