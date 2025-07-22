@@ -41,18 +41,3 @@ A modern Angular-based bill-splitting application designed to manage group expen
 | Route Guards     | Authentication protection             |
 
 ---
-
-
-
-src/
-│
-├── app/
-│ ├── auth/ # Login & Registration components
-│ ├── dashboard/ # User dashboard & group list
-│ ├── group/ # Group detail & expense management
-│ ├── shared/ # Reusable services, guards, interceptors
-│ └── core/ # App-level config and providers
-│
-├── assets/ # Static files
-├── environments/ # environment.ts, environment.prod.ts
-└── db.json # Mock data for JSON Server
