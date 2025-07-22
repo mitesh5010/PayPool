@@ -42,7 +42,7 @@ import { LoadingService } from '../../Service/loading.service';
   encapsulation: ViewEncapsulation.None,
 })
 export class GroupsComponent implements OnInit {
-  groups!: Group[];
+  groups: Group[] = [];
   showGroupDialog = false;
   showViewGroupDialog = false;
   showExDialog = false;
@@ -53,44 +53,19 @@ export class GroupsComponent implements OnInit {
   userId: number = 0;
   allExpenses!:Expense[];
   showSettleDialog = false;
+  isLoading = true;
 
   constructor(private fb: FormBuilder, private apiService: ApiService, private auth: AuthService, private splitCal: SplitCalculationService, private loading: LoadingService) {}
 
   ngOnInit() {
-    this.loading.show();
-    // Replace with real service call
     this.userId = this.auth.getUserId();
-    // this.apiService.getAllGroups().subscribe({
-    //   next: (data) => {
-    //     const allGroups = data.slice().reverse();
-    //     this.groups = this.filterUserGroups(allGroups,this.userId).map(group =>{
-    //       const {total, youOwe, owedToYou } = this.splitCal.calculateGroupStats(this.allExpenses, group, this.userId)
-    //       return { ...group, total, youOwe, owedToYou}
-    //     })
-    //   },
-    //   error: (err) => {
-    //     console.error('Failed to load groups:', err);
-    //   },
-    // });
-    // this.apiService.getAllExpenses().subscribe({
-    //   next: data => {
-    //     this.allExpenses = data
-    //   },
-    //   error: err => console.log('error! for expenses get:',err)
-      
-    // })
-    // this.apiService.getAllUsers().subscribe({
-    //   next: (data) => {
-    //     this.allMembers = data;
-    //   },
-    //   error: (err) => {
-    //     console.error('Failed to load users:', err);
-    //   },
-    // });
     this.loadData()
     
   }
   loadData(){
+    this.isLoading = true; // Set loading state
+    this.loading.show(); // Show visual spinner
+
     this.newGroup = this.fb.group({
       name: ['', Validators.required],
       description: [''],
@@ -113,9 +88,14 @@ export class GroupsComponent implements OnInit {
         const isSettled = stats.youOwe === 0 && stats.owedToYou === 0;
         return { ...group, ...stats, status: isSettled ? 'SETTLED' : 'ACTIVE' };
       });
+      this.isLoading = false;
       this.loading.hide();
       },
-      error: err => console.error('Failed to load data:', err)
+      error: err => {
+        console.error('Failed to load data:', err);
+        this.isLoading = false;
+        this.loading.hide();
+      }
     })
   }
   

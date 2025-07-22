@@ -8,6 +8,7 @@ import { AddExpenseDialogComponent } from "./add-expense-dialog/add-expense-dial
 import { Category, Expense, Group, User } from '../../Service/data.model';
 import { AuthService } from '../../auth/auth.service';
 import { LoadingService } from '../../Service/loading.service';
+import { forkJoin } from 'rxjs';
 
 interface NameUser extends User {
   name: string
@@ -39,46 +40,30 @@ export class ExpensesComponent implements OnInit {
     
   }
   loadData(){
-    this.apiService.getAllExpenses().subscribe({
-    next: (data) => {
-      this.expenses = data.filter(exp =>
+    this.loading.show();
+    forkJoin({
+      expenses: this.apiService.getAllExpenses(),
+      categories: this.apiService.getCategories(),
+      groups: this.apiService.getAllGroups(),
+      users: this.apiService.getAllUsers()
+    }).subscribe({
+      next: ({ expenses, categories, groups, users }) => {
+        this.expenses = expenses.filter(exp =>
           exp.splitDetails.some(split => split.id === this.userId)
-        )
-        .reverse();
-    },
-    error: (err) => {
-      console.error('Failed to load expenses:', err);
-    }
-  });
-  this.apiService.getCategories().subscribe({
-    next: (data) => {
-      this.categories = data;
-    },
-    error: (err) => {
-      console.error('Failed to load expenses:', err);
-    }
-  });
-  this.apiService.getAllGroups().subscribe({
-    next: (data) => {
-      this.groups = data;
-      
-      if (this.groups.length > 0) {
-        this.groupMembers = this.groups[0].members;
+        ).reverse();
+        this.categories = categories;
+        this.groups = groups;
+        if (this.groups.length > 0) {
+          this.groupMembers = this.groups[0].members;
+        }
+        this.users = users;
+        this.loading.hide();
+      },
+      error: (err) => {
+        console.error('Failed to load data:', err);
+        this.loading.hide();
       }
-    }
-    , error: (err) => {
-      console.error('Failed to load groups:', err);
-    }
-  });
-  this.apiService.getAllUsers().subscribe({
-    next: (data) => { 
-      this.users = data;
-    },
-    error: (err) => {
-      console.error('Failed to load users:', err);
-    }
-  });
-  this.loading.hide();
+    });
   }
 
   getName(id:number){

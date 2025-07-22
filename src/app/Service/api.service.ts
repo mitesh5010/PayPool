@@ -8,7 +8,7 @@ import { Category, Expense, Group, Settlement, User } from './data.model';
 })
 export class ApiService {
   
-  private readonly apiUrl = 'http://localhost:3000';
+  private readonly apiUrl = 'https://json-server-auth-27lj.onrender.com';
   constructor(private http: HttpClient) { }
 
   getAllUsers(): Observable<User[]>{
