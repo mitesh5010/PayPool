@@ -18,27 +18,21 @@ export class PinVerificationDialogComponent {
   pinForm!: FormGroup;
   constructor(private fb: FormBuilder, private auth: AuthService){
     this.pinForm = this.fb.group({
-      pin: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(4), Validators.pattern(/^\d+$/)]]
+      pin: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(4), Validators.pattern(/^\d{4}$/)]]
   })}
-  onPinInput(event: Event){}
 
   verifyPin():void{
-    const value = this.pinForm.value.pin;
-    const pin = parseInt(value);
+    const pin: string = this.pinForm.value.pin;
 
     this.auth.verifyPin(this.auth.getUserId(), pin).subscribe({
       next: isValid => {
         this.verified.emit(isValid);
         this.pinForm.reset();
-        console.log('valid', isValid)
       },
       error: err => {
         this.verified.emit(false);
-        console.log('PIN error', err)
       }
     })
-    
-    console.log(pin);
     
   }
 
