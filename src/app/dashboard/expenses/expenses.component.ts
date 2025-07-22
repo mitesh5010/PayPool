@@ -1,7 +1,5 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
 import {  FormGroup } from '@angular/forms';
 import { ApiService} from '../../Service/api.service';
 import { AddExpenseDialogComponent } from "./add-expense-dialog/add-expense-dialog.component";
@@ -9,6 +7,7 @@ import { Category, Expense, Group, User } from '../../Service/data.model';
 import { AuthService } from '../../auth/auth.service';
 import { LoadingService } from '../../Service/loading.service';
 import { forkJoin } from 'rxjs';
+import { PrimeNGModules } from '../../shared/primeng-imports/primeng-imports.module';
 
 interface NameUser extends User {
   name: string
@@ -16,7 +15,7 @@ interface NameUser extends User {
 
 @Component({
   selector: 'app-expenses',
-  imports: [CommonModule, CardModule, ButtonModule, AddExpenseDialogComponent],
+  imports: [CommonModule, PrimeNGModules,AddExpenseDialogComponent],
   templateUrl: './expenses.component.html',
   styleUrl: './expenses.component.css',
   providers:[DatePipe]

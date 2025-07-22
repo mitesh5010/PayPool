@@ -9,15 +9,8 @@ import {
   signal,
   ViewEncapsulation,
 } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
-import { Dialog } from 'primeng/dialog';
 import { DisplaySettlement, Expense, Group, Settlement, User } from '../../../Service/data.model';
-import { TabsModule } from 'primeng/tabs';
-import { AvatarModule } from 'primeng/avatar';
-import { DividerModule } from 'primeng/divider';
 import { CommonModule, CurrencyPipe } from '@angular/common';
-import { CardModule } from 'primeng/card';
-import { BadgeModule } from 'primeng/badge';
 import { ApiService } from '../../../Service/api.service';
 import { LoadingService } from '../../../Service/loading.service';
 import { MessageService } from 'primeng/api';
@@ -26,20 +19,15 @@ import { SettlementService } from '../../../Service/settlement.service';
 import { forkJoin } from 'rxjs';
 import { AuthService } from '../../../auth/auth.service';
 import { Toast } from "primeng/toast";
+import { PrimeNGModules } from '../../../shared/primeng-imports/primeng-imports.module';
 
 type TabValue = 1 | 2 | 3;
 
 @Component({
   selector: 'app-view-group',
   imports: [
-    Dialog,
-    ButtonModule,
-    TabsModule,
-    AvatarModule,
-    DividerModule,
     CurrencyPipe,
-    CardModule,
-    BadgeModule,
+    PrimeNGModules,
     CommonModule,
     PinVerificationDialogComponent,
     Toast

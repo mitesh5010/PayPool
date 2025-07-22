@@ -2,12 +2,8 @@ import { Component, OnInit, signal, ViewEncapsulation } from '@angular/core';
 import { SidebarComponent } from "../shared/sidebar/sidebar.component";
 import { RouterOutlet } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
-import { OverlayPanelModule } from 'primeng/overlaypanel';
-import { ButtonModule } from 'primeng/button';
-import { AvatarModule } from 'primeng/avatar';
-import { CommonModule } from '@angular/common';
 import {  User } from '../Service/data.model';
-import { DashboardService } from '../Service/dashboard.service';
+import { PrimeNGModules } from '../shared/primeng-imports/primeng-imports.module';
 
 
 
@@ -15,10 +11,7 @@ import { DashboardService } from '../Service/dashboard.service';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [ SidebarComponent, RouterOutlet, AvatarModule,
-  OverlayPanelModule,
-  ButtonModule,
-  CommonModule],
+  imports: [ SidebarComponent, RouterOutlet, PrimeNGModules],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
   encapsulation: ViewEncapsulation.None
@@ -27,7 +20,7 @@ export class DashboardComponent implements OnInit {
   user!:User;
   sidebarOpen = signal(true);
 
-  constructor(private auth: AuthService, private dashboardService: DashboardService){
+  constructor(private auth: AuthService){
   }
   ngOnInit(): void {
     
