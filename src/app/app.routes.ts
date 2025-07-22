@@ -1,49 +1,49 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
 import { AuthGuard, LoginGuard } from './auth/auth.guard';
-import { UserDashboardComponent } from './dashboard/user-dashboard/user-dashboard.component';
-import { ExpensesComponent } from './dashboard/expenses/expenses.component';
-import { GroupsComponent } from './dashboard/groups/groups.component';
-import { SettlementsComponent } from './dashboard/settlements/settlements.component';
 
 export const routes: Routes = [
   {
     path: 'login',
     component: LoginComponent,
-    canActivate:[LoginGuard]
+    canActivate: [LoginGuard],
   },
   {
-    path:'',
-    redirectTo:'login',
-    pathMatch: 'full'
+    path: '',
+    redirectTo: 'login',
+    pathMatch: 'full',
   },
   {
-    path:'register',
-    component:RegisterComponent,
-    canActivate:[LoginGuard]
+    path: 'register',
+    component: RegisterComponent,
+    canActivate: [LoginGuard],
   },
   {
     path: 'dashboard',
-    component: DashboardComponent,
-    canActivate:[AuthGuard],
-    children:[
+    loadComponent: () =>
+      import('./dashboard/dashboard.component').then(m => m.DashboardComponent),
+    canActivate: [AuthGuard],
+    children: [
       {
         path: '',
-        component: UserDashboardComponent
+        loadComponent: () =>
+          import('./dashboard/user-dashboard/user-dashboard.component').then(m => m.UserDashboardComponent),
       },
       {
         path: 'expenses',
-        component: ExpensesComponent,
+        loadComponent: () =>
+          import('./dashboard/expenses/expenses.component').then(m => m.ExpensesComponent),
       },
       {
         path: 'groups',
-        component: GroupsComponent
+        loadComponent: () =>
+          import('./dashboard/groups/groups.component').then(m => m.GroupsComponent),
       },
       {
         path: 'settlement',
-        component: SettlementsComponent
+        loadComponent: () =>
+          import('./dashboard/settlements/settlements.component').then(m => m.SettlementsComponent),
       }
     ],
   }
