@@ -9,44 +9,52 @@ export class SplitCalculationService {
   constructor() { }
 
   calculateGroupStats(expenses: Expense[], group:Group, userId:number, settlements: Settlement[] = []){
-    let total = 0;
-    let youOwe = 0;
-    let owedToYou = 0;
+   
     if (!expenses || !group || !group.members) {
     return { total: 0, youOwe: 0, owedToYou: 0 };
   }
 
     const groupExpenses = expenses.filter(e => e.selectedGroupId === group.id);
-    // Filter settlements for this group
     const groupSettlements = settlements.filter(s => s.groupId === group.id);
+
+    // Calculate raw amounts before settlements
+    let total = 0;
+    let rawYouOwe = 0;
+    let rawOwedToYou = 0;
 
     groupExpenses.forEach(exp => {
       total += exp.amount;
-
       const userSplit = exp.splitDetails.find(s => s.id === userId)?.amount || 0;
 
-      // You didn't pay, but owe part of it
-      if (userSplit > 0 && exp.paidBy !== userId) {
-        youOwe += userSplit;
-      }
-      // You paid (you are the creator), others owe you
       if (exp.paidBy === userId) {
+        // You paid - others owe you their shares
         exp.splitDetails.forEach(split => {
           if (split.id !== userId) {
-            owedToYou += split.amount;
+            rawOwedToYou += split.amount;
           }
         });
+      } else if (userSplit > 0) {
+        // You owe your share to someone else
+        rawYouOwe += userSplit;
       }
     });
+
+    // Apply settlement adjustments
+    let settledYouOwe = 0;
+    let settledOwedToYou = 0;
+
     groupSettlements.forEach(settlement => {
       if (settlement.fromId === userId) {
-        // You paid to someone (reduces what you owe)
-        youOwe = Math.max(0, youOwe - settlement.amount);
+        settledYouOwe += settlement.amount;
       } else if (settlement.toId === userId) {
-        // Someone paid you (reduces what's owed to you)
-        owedToYou = Math.max(0, owedToYou - settlement.amount);
+        settledOwedToYou += settlement.amount;
       }
     });
-    return {total, youOwe, owedToYou};
+
+    // Calculate final amounts
+    const youOwe = Math.max(0, rawYouOwe - settledYouOwe);
+    const owedToYou = Math.max(0, rawOwedToYou - settledOwedToYou);
+
+    return { total, youOwe, owedToYou };
   }
 }

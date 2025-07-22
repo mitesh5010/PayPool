@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ApiService } from './api.service';
 import { forkJoin, map, Observable } from 'rxjs';
-import { Group, Settlement } from './data.model';
 import { SplitCalculationService } from './split-calculation.service';
 
 @Injectable({
@@ -29,36 +28,33 @@ export class DashboardService {
 
         let totalYouOwe = 0;
         let totalOwedToYou = 0;
-        let groupTotals = 0;
         let totalExpenses = 0;
         let activeGroupsCount = 0;
 
-        // Calculate totals across all groups
-        userGroups.forEach((group) => {
-          const groupSettlements = settlements.filter(
-            (s) => s.groupId === group.id
-          );
+         // Calculate user's share in all expenses (what they participated in)
+        expenses.forEach(expense => {
+          const userShare = expense.splitDetails.find(s => s.id === userId);
+          if (userShare) {
+            totalExpenses += userShare.amount;
+          }
+        });
+
+        // Calculate group-wise balances
+        userGroups.forEach(group => {
+          const groupSettlements = settlements.filter(s => s.groupId === group.id);
           const stats = this.splitCalculation.calculateGroupStats(
             expenses,
             group,
             userId,
             groupSettlements
           );
-          const settlementAdjustments = this.calculateSettlementAdjustments(settlements, group.id!, userId);
-          const adjustedYouOwe = Math.max(0, stats.youOwe - settlementAdjustments.paidSettlements);
-          const adjustedOwedToYou = Math.max(0, stats.owedToYou - settlementAdjustments.receivedSettlements);
-          if (adjustedYouOwe > 0 || adjustedOwedToYou > 0) {
+
+          if (stats.youOwe > 0 || stats.owedToYou > 0) {
             activeGroupsCount++;
           }
-           totalYouOwe += adjustedYouOwe;
-          totalOwedToYou += adjustedOwedToYou;
-          
-        });
-        expenses.forEach((exp) => {
-          const userShare = exp.splitDetails.find((s) => s.id === userId);
-          if (userShare) {
-            totalExpenses += userShare.amount;
-          }
+
+          totalYouOwe += stats.youOwe;
+          totalOwedToYou += stats.owedToYou;
         });
         if (totalOwedToYou) {
           totalExpenses += totalOwedToYou;
@@ -72,30 +68,9 @@ export class DashboardService {
           totalYouOwe,
           totalOwedToYou,
           activeGroupsCount,
-          netBalance: totalOwedToYou - totalYouOwe,
+          netBalance: totalOwedToYou - totalYouOwe
         };
       })
     );
-  }
-
-  private calculateSettlementAdjustments(
-    settlements: Settlement[],
-    groupId: number,
-    userId: number
-  ) {
-    let paidSettlements = 0;
-    let receivedSettlements = 0;
-
-    settlements
-      .filter((s) => s.groupId === groupId)
-      .forEach((settlement) => {
-        if (settlement.fromId === userId) {
-          paidSettlements += settlement.amount;
-        } else if (settlement.toId === userId) {
-          receivedSettlements += settlement.amount;
-        }
-      });
-
-    return { paidSettlements, receivedSettlements };
   }
 }
