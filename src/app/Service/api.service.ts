@@ -2,13 +2,14 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { Category, Expense, Group, Settlement, User } from './data.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
   
-  private readonly apiUrl = 'https://json-server-auth-27lj.onrender.com';
+  private readonly apiUrl = `${environment.apiUrl}`;
   constructor(private http: HttpClient) { }
 
   getAllUsers(): Observable<User[]>{
