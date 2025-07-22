@@ -44,6 +44,7 @@ export interface Group {
 }
 
 export interface Settlement {
+  id?:number;
   fromId: number;
   toId: number;
   amount: number;

@@ -26,7 +26,7 @@
 
 <p-toast></p-toast>
 
-@for (settlement of settlements; track settlement) {
+@for (settlement of settlements; track $index) {
 <div class="settlement-item flex align-items-center justify-content-between p-3 border-round border-1">
   <div class="flex align-items-center gap-3">
     <div class="settlement-avatar w-3rem h-3rem border-circle bg-primary-100 text-primary-800 flex align-items-center justify-content-center">

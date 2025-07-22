@@ -70,7 +70,7 @@ export class AuthService {
     return !!this.getToken();
   }
 
-  verifyPin(userId: number, pin: number){
+  verifyPin(userId: number, pin: string){
     return this.http.get<any>(`${this.api}/users/${userId}`).pipe(
       map(user => {
         return user && user.pin === pin;
