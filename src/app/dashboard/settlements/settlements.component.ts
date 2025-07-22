@@ -1,9 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
-import { TagModule } from 'primeng/tag';
 import { AuthService } from '../../auth/auth.service';
 import { forkJoin } from 'rxjs';
 import { finalize } from 'rxjs/operators';
@@ -13,16 +10,15 @@ import { SettlementService } from '../../Service/settlement.service';
 import { MessageService } from 'primeng/api';
 import { LoadingService } from '../../Service/loading.service';
 import { PinVerificationDialogComponent } from '../pin-verification-dialog/pin-verification-dialog.component';
+import { PrimeNGModules } from '../../shared/primeng-imports/primeng-imports.module';
 
 @Component({
   selector: 'app-settlements',
   standalone: true,
   imports: [
     CommonModule,
-    ButtonModule,
-    DialogModule,
+    PrimeNGModules,
     ToastModule,
-    TagModule,
     PinVerificationDialogComponent
   ],
   templateUrl: './settlements.component.html',

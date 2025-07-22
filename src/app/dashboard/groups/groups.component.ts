@@ -1,18 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
-import { MenuModule } from 'primeng/menu';
-import { DividerModule } from 'primeng/divider';
-import { DialogModule } from 'primeng/dialog';
 import {
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { InputText } from 'primeng/inputtext';
-import { MultiSelectModule } from 'primeng/multiselect';
 import { ApiService } from '../../Service/api.service';
 import { AddExpenseDialogComponent } from '../expenses/add-expense-dialog/add-expense-dialog.component';
 import { Expense, Group, User } from '../../Service/data.model';
@@ -21,18 +14,13 @@ import { ViewGroupComponent } from "./view-group/view-group.component";
 import { SplitCalculationService } from '../../Service/split-calculation.service';
 import { forkJoin } from 'rxjs';
 import { LoadingService } from '../../Service/loading.service';
+import { PrimeNGModules } from '../../shared/primeng-imports/primeng-imports.module';
 
 @Component({
   selector: 'app-groups',
   imports: [
-    ButtonModule,
-    MenuModule,
     CommonModule,
-    CardModule,
-    DividerModule,
-    DialogModule,
-    InputText,
-    MultiSelectModule,
+    PrimeNGModules,
     ReactiveFormsModule,
     AddExpenseDialogComponent,
     ViewGroupComponent

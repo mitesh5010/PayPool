@@ -1,13 +1,12 @@
 import { Component, Input, output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-import { Dialog } from "primeng/dialog";
 import { PasswordModule } from 'primeng/password';
 import { AuthService } from '../../auth/auth.service';
+import { PrimeNGModules } from '../../shared/primeng-imports/primeng-imports.module';
 
 @Component({
   selector: 'app-pin-verification-dialog',
-  imports: [Dialog, PasswordModule, ReactiveFormsModule, ButtonModule],
+  imports: [PrimeNGModules, PasswordModule, ReactiveFormsModule],
   templateUrl: './pin-verification-dialog.component.html',
   styleUrl: './pin-verification-dialog.component.css'
 })

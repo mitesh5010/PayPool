@@ -1,15 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { ToolbarModule } from 'primeng/toolbar';
-import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
 import { ChartModule } from 'primeng/chart';
-import { ListboxModule } from 'primeng/listbox';
-import { Group } from '../../Service/data.model';
 import { AuthService } from '../../auth/auth.service';
 import { DashboardService } from '../../Service/dashboard.service';
 import { forkJoin } from 'rxjs';
 import { CurrencyPipe } from '@angular/common';
 import { LoadingService } from '../../Service/loading.service';
+import { PrimeNGModules } from '../../shared/primeng-imports/primeng-imports.module';
 
 interface DashboardStats {
   totalExpenses: number;
@@ -20,7 +17,7 @@ interface DashboardStats {
 
 @Component({
   selector: 'app-user-dashboard',
-  imports: [ToolbarModule, ButtonModule, CardModule, ChartModule, ListboxModule, CurrencyPipe],
+  imports: [ToolbarModule, PrimeNGModules, ChartModule, CurrencyPipe],
   templateUrl: './user-dashboard.component.html',
   styleUrl: './user-dashboard.component.css'
 })

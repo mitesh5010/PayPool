@@ -16,41 +16,20 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { CurrencyPipe, DatePipe } from '@angular/common';
-import { DialogModule } from 'primeng/dialog';
-import { DatePickerModule } from 'primeng/datepicker';
-import { SelectModule } from 'primeng/select';
-import { ButtonModule } from 'primeng/button';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { InputTextModule } from 'primeng/inputtext';
-import { CalendarModule } from 'primeng/calendar';
-import { MultiSelectModule } from 'primeng/multiselect';
-import { SelectButtonModule } from 'primeng/selectbutton';
-import { DividerModule } from 'primeng/divider';
-import { CheckboxModule } from 'primeng/checkbox';
-
 import { ApiService } from '../../../Service/api.service';
 import { Category, Expense, Group, User } from '../../../Service/data.model';
 import { distinctUntilChanged } from 'rxjs';
 import { AuthService } from '../../../auth/auth.service';
 import { LoadingService } from '../../../Service/loading.service';
+import { PrimeNGModules } from '../../../shared/primeng-imports/primeng-imports.module';
 
 @Component({
   selector: 'app-add-expense-dialog',
   standalone: true,
   imports: [
-    DialogModule,
     ReactiveFormsModule,
-    DatePickerModule,
-    SelectModule,
-    ButtonModule,
-    InputNumberModule,
-    InputTextModule,
-    CalendarModule,
-    MultiSelectModule,
-    SelectButtonModule,
-    DividerModule,
-    CheckboxModule,
     CurrencyPipe,
+    PrimeNGModules
   ],
   templateUrl: './add-expense-dialog.component.html',
   styleUrls: ['./add-expense-dialog.component.css'],
