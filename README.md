@@ -1,7 +1,9 @@
 # PayPool - Bill Splitting Application
 
 A modern Angular-based bill-splitting application designed to manage group expenses with ease. Built with authentication, authorization, group and expense tracking, and clean UI – all using Angular (latest) and JSON Server for API simulation.
-
+---
+## Live Demo
+https://pay-pool.vercel.app
 ---
 
 ## 📌 Features
